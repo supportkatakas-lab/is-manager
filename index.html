@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>IS Manager</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0d0f14;--surface:#161923;--surface2:#1e2535;--border:#2a3148;
+  --accent:#3b82f6;--accent2:#22d3ee;--green:#10b981;--yellow:#f59e0b;--red:#ef4444;
+  --text:#e2e8f0;--muted:#64748b;--radius:10px;
+}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-serif;min-height:100vh;}
+.app{display:flex;flex-direction:column;min-height:100vh;}
+.nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px;display:flex;align-items:center;gap:6px;min-height:56px;position:sticky;top:0;z-index:100;flex-wrap:wrap;}
+.nav-logo{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--accent2);letter-spacing:2px;margin-right:12px;white-space:nowrap;}
+.nav-tab{background:none;border:none;color:var(--muted);font-family:'Noto Sans JP',sans-serif;font-size:13px;font-weight:500;padding:6px 12px;border-radius:6px;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.nav-tab:hover{background:var(--surface2);color:var(--text);}
+.nav-tab.active{background:var(--accent);color:#fff;}
+.main{flex:1;padding:24px 16px;max-width:1200px;margin:0 auto;width:100%;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;}
+.card+.card{margin-top:16px;}
+.card-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+@media(max-width:700px){.grid2,.grid4{grid-template-columns:1fr 1fr;}}
+.stat{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;}
+.stat-label{font-size:11px;color:var(--muted);margin-bottom:4px;}
+.stat-value{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;}
+.progress-bar{height:5px;background:var(--border);border-radius:999px;overflow:hidden;margin-top:4px;}
+.progress-fill{height:100%;border-radius:999px;transition:width .5s;}
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{padding:9px 12px;text-align:left;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--surface2);}
+.form-label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:5px;}
+.form-input,.form-select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:14px;padding:8px 12px;outline:none;transition:border .2s;}
+.form-input:focus,.form-select:focus{border-color:var(--accent);}
+.form-select option{background:var(--surface2);}
+.call-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+@media(min-width:480px){.call-grid{grid-template-columns:repeat(4,1fr);}}
+.call-field{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;}
+.call-field label{display:block;font-size:10px;font-weight:600;margin-bottom:4px;}
+.call-field input{width:100%;background:transparent;border:none;color:var(--text);font-family:'Space Mono',monospace;font-size:20px;font-weight:700;outline:none;}
+.btn{border:none;border-radius:7px;font-family:'Noto Sans JP',sans-serif;font-size:14px;font-weight:700;padding:9px 18px;cursor:pointer;transition:all .2s;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:#2563eb;}
+.btn-danger{background:transparent;border:1px solid var(--red);color:var(--red);font-size:12px;padding:5px 10px;}
+.btn-danger:hover{background:var(--red);color:#fff;}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted);font-size:13px;padding:7px 14px;}
+.btn-ghost:hover{border-color:var(--accent2);color:var(--accent2);}
+.btn-green{background:var(--green);color:#fff;}
+.btn-green:hover{opacity:.85;}
+.badge{display:inline-block;border-radius:99px;font-size:11px;font-weight:700;padding:2px 8px;}
+.badge-blue{background:rgba(59,130,246,.15);color:var(--accent);}
+.badge-cyan{background:rgba(34,211,238,.12);color:var(--accent2);}
+.sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.sec-title{font-size:16px;font-weight:700;}
+.success-msg{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:8px;padding:14px;color:var(--green);font-weight:600;text-align:center;margin-bottom:16px;}
+.error-msg{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:12px;color:var(--red);margin-bottom:14px;font-size:13px;}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.filter-row select{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:7px 12px;font-size:13px;font-family:'Noto Sans JP',sans-serif;outline:none;}
+.empty{text-align:center;padding:32px;color:var(--muted);font-size:14px;}
+.member-tag{background:var(--surface2);border:1px solid var(--border);border-radius:4px;font-size:11px;padding:2px 8px;color:var(--muted);cursor:pointer;display:inline-block;margin:2px;}
+.member-tag.selected{background:rgba(59,130,246,.2);border-color:var(--accent);color:var(--accent);}
+.list-entry{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;}
+.list-entry-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.list-entry-title{font-size:13px;font-weight:700;color:var(--accent2);}
+.list-chip{background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.25);border-radius:6px;padding:3px 10px;font-size:12px;color:var(--accent2);display:inline-flex;align-items:center;gap:6px;margin:2px;}
+.list-chip-x{cursor:pointer;color:var(--red);font-weight:700;}
+.expand-btn{background:none;border:none;color:var(--accent);cursor:pointer;font-size:12px;padding:2px 6px;}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState, useEffect, useCallback} = React;
+
+// ===== STORAGE (localStorage for standalone deployment) =====
+const LS = {
+  get: (k) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch { return null; } },
+  set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) { console.error(e); } },
+};
+
+const DEFAULT_MEMBERS = [
+  {id:"m1", name:"田中 花子"},
+  {id:"m2", name:"佐藤 太郎"},
+  {id:"m3", name:"鈴木 一郎"},
+];
+const DEFAULT_PROJECTS = [
+  {id:"p1", name:"株式会社Aサービス", targetAppo:20, memberIds:["m1","m2"], lists:["リストA-1","リストA-2","リストA-3"]},
+  {id:"p2", name:"B社クラウド案件",   targetAppo:15, memberIds:["m2","m3"], lists:["リストB-1","リストB-2"]},
+  {id:"p3", name:"C社HR支援",         targetAppo:10, memberIds:["m1","m3"], lists:["リストC-1"]},
+];
+
+const CALL_FIELDS = [
+  {key:"calls",             label:"架電数",       color:"var(--text)"},
+  {key:"appo",              label:"アポ数",       color:"var(--accent)"},
+  {key:"materialSelf",      label:"本人資料請求", color:"var(--accent2)"},
+  {key:"noAnswer",          label:"不通",         color:"var(--muted)"},
+  {key:"absent",            label:"本人不在",     color:"var(--muted)"},
+  {key:"rejectedSelf",      label:"本人拒否",     color:"var(--red)"},
+  {key:"rejectedReception", label:"受付拒否",     color:"var(--red)"},
+  {key:"materialReception", label:"受付資料請求", color:"var(--yellow)"},
+];
+
+const EMPTY_ENTRY = () => ({listName:"",calls:"",appo:"",materialSelf:"",noAnswer:"",absent:"",rejectedSelf:"",rejectedReception:"",materialReception:""});
+
+function calcStats(reports) {
+  const t = {calls:0,appo:0,materialSelf:0,noAnswer:0,absent:0,rejectedSelf:0,rejectedReception:0,materialReception:0};
+  reports.forEach(r => {
+    const entries = r.entries && r.entries.length ? r.entries : [r];
+    entries.forEach(e => { Object.keys(t).forEach(k => { t[k] += Number(e[k])||0; }); });
+  });
+  const connected = t.appo + t.materialSelf + t.absent + t.rejectedSelf;
+  return {
+    ...t, connected,
+    appoRate:    t.calls>0 ? ((t.appo/t.calls)*100).toFixed(1) : "0.0",
+    connectRate: t.calls>0 ? ((connected/t.calls)*100).toFixed(1) : "0.0",
+    caRate:      connected>0 ? (((t.appo+t.materialSelf)/connected)*100).toFixed(1) : "0.0",
+  };
+}
+
+// ===== DASHBOARD =====
+function DashboardView({members, projects, reports}) {
+  const [fp, setFp] = useState("all");
+  const [fm, setFm] = useState("all");
+  const [fmo, setFmo] = useState("all");
+  const [expandedId, setExpandedId] = useState(null);
+
+  const months = [...new Set(reports.map(r=>r.date?.slice(0,7)))].sort().reverse();
+  const filtered = reports.filter(r => {
+    if (fp!=="all" && r.projectId!==fp) return false;
+    if (fm!=="all" && r.memberId!==fm) return false;
+    if (fmo!=="all" && !r.date?.startsWith(fmo)) return false;
+    return true;
+  });
+  const overall = calcStats(filtered);
+  const getM = id => members.find(m=>m.id===id)?.name||id;
+  const getP = id => projects.find(p=>p.id===id)?.name||id;
+
+  // list breakdown
+  const listMap = {};
+  filtered.forEach(r => {
+    (r.entries||[]).forEach(e => {
+      const k = r.projectId+"|||"+e.listName;
+      if (!listMap[k]) listMap[k] = {projectId:r.projectId, listName:e.listName, rows:[]};
+      listMap[k].rows.push(e);
+    });
+  });
+
+  return (
+    <div>
+      <div className="sec-header"><div className="sec-title">📊 ダッシュボード</div></div>
+      <div className="filter-row">
+        <select value={fp} onChange={e=>setFp(e.target.value)}>
+          <option value="all">全案件</option>
+          {projects.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}
+        </select>
+        <select value={fm} onChange={e=>setFm(e.target.value)}>
+          <option value="all">全メンバー</option>
+          {members.map(m=><option key={m.id} value={m.id}>{m.name}</option>)}
+        </select>
+        <select value={fmo} onChange={e=>setFmo(e.target.value)}>
+          <option value="all">全期間</option>
+          {months.map(m=><option key={m} value={m}>{m}</option>)}
+        </select>
+      </div>
+
+      <div className="card" style={{marginBottom:16}}>
+        <div className="card-title">全体サマリー（{filtered.length}件の報告）</div>
+        <div className="grid4">
+          {[
+            {label:"架電数",       val:overall.calls.toLocaleString(), col:"var(--text)"},
+            {label:"アポ数",       val:overall.appo,                   col:"var(--accent)"},
+            {label:"アポ率",       val:overall.appoRate+"%",           col:"var(--green)"},
+            {label:"通電率",       val:overall.connectRate+"%",        col:"var(--yellow)"},
+            {label:"CA率",         val:overall.caRate+"%",             col:"var(--accent2)"},
+            {label:"本人資料請求", val:overall.materialSelf,           col:"var(--text)"},
+            {label:"受付資料請求", val:overall.materialReception,      col:"var(--text)"},
+            {label:"不通",         val:overall.noAnswer,               col:"var(--muted)"},
+          ].map(s=>(
+            <div className="stat" key={s.label}>
+              <div className="stat-label">{s.label}</div>
+              <div className="stat-value" style={{color:s.col}}>{s.val}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="card" style={{marginBottom:16}}>
+        <div className="card-title">案件別進捗</div>
+        <div className="tbl-wrap">
+          <table>
+            <thead><tr><th>案件名</th><th>目標</th><th>アポ</th><th>進捗率</th><th>架電</th><th>アポ率</th><th>通電率</th><th>CA率</th></tr></thead>
+            <tbody>
+              {projects.map(p=>{
+                const s = calcStats(filtered.filter(r=>r.projectId===p.id));
+                const pct = p.targetAppo>0 ? Math.min(100,s.appo/p.targetAppo*100).toFixed(0) : 0;
+                const col = pct>=80?"var(--green)":pct>=50?"var(--yellow)":"var(--accent)";
+                return (
+                  <tr key={p.id}>
+                    <td style={{fontWeight:600}}>{p.name}</td>
+                    <td>{p.targetAppo}</td>
+                    <td style={{color:"var(--accent)",fontWeight:700}}>{s.appo}</td>
+                    <td><span style={{fontSize:12,fontWeight:700,color:col}}>{pct}%</span>
+                      <div className="progress-bar"><div className="progress-fill" style={{width:pct+"%",background:col}}/></div></td>
+                    <td>{s.calls}</td><td>{s.appoRate}%</td><td>{s.connectRate}%</td><td>{s.caRate}%</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {Object.keys(listMap).length>0 && (
+        <div className="card" style={{marginBottom:16}}>
+          <div className="card-title">リスト別詳細</div>
+          <div className="tbl-wrap">
+            <table>
+              <thead><tr><th>案件</th><th>リスト名</th><th>架電</th><th>アポ</th><th>本人資料</th><th>不通</th><th>不在</th><th>本人拒否</th><th>受付拒否</th><th>受付資料</th><th>アポ率</th><th>通電率</th></tr></thead>
+              <tbody>
+                {Object.values(listMap).map((ls,i)=>{
+                  const s = calcStats([{entries:ls.rows}]);
+                  return (
+                    <tr key={i}>
+                      <td><span className="badge badge-blue">{getP(ls.projectId)}</span></td>
+                      <td style={{color:"var(--accent2)",fontWeight:600}}>{ls.listName}</td>
+                      <td>{s.calls}</td>
+                      <td style={{color:"var(--accent)",fontWeight:700}}>{s.appo}</td>
+                      <td>{s.materialSelf}</td>
+                      <td style={{color:"var(--muted)"}}>{s.noAnswer}</td>
+                      <td style={{color:"var(--muted)"}}>{s.absent}</td>
+                      <td style={{color:"var(--red)"}}>{s.rejectedSelf}</td>
+                      <td style={{color:"var(--red)"}}>{s.rejectedReception}</td>
+                      <td>{s.materialReception}</td>
+                      <td>{s.appoRate}%</td>
+                      <td>{s.connectRate}%</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      <div className="card">
+        <div className="card-title">メンバー別実績</div>
+        <div className="tbl-wrap">
+          <table>
+            <thead><tr><th>名前</th><th>報告数</th><th>架電</th><th>アポ</th><th>アポ率</th><th>通電率</th><th>CA率</th></tr></thead>
+            <tbody>
+              {members.map(m=>{
+                const mr = filtered.filter(r=>r.memberId===m.id);
+                if (!mr.length) return null;
+                const s = calcStats(mr);
+                return (
+                  <tr key={m.id}>
+                    <td style={{fontWeight:600}}>{m.name}</td>
+                    <td><span className="badge badge-blue">{mr.length}日</span></td>
+                    <td>{s.calls}</td>
+                    <td style={{color:"var(--accent)",fontWeight:700}}>{s.appo}</td>
+                    <td>{s.appoRate}%</td><td>{s.connectRate}%</td><td>{s.caRate}%</td>
+                  </tr>
+                );
+              })}
+              {members.every(m=>filtered.filter(r=>r.memberId===m.id).length===0)&&(
+                <tr><td colSpan={7} className="empty">報告データがありません</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ===== REPORT FORM =====
+function ReportFormView({members, projects, onSubmit}) {
+  const today = new Date().toISOString().slice(0,10);
+  const [date, setDate] = useState(today);
+  const [memberId, setMemberId] = useState("");
+  const [projectId, setProjectId] = useState("");
+  const [entries, setEntries] = useState([EMPTY_ENTRY()]);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
+
+  const memberProjects = memberId ? projects.filter(p=>p.memberIds?.includes(memberId)) : [];
+  const currentProject = projects.find(p=>p.id===projectId);
+  const listOptions = currentProject?.lists||[];
+
+  const setEntry = (i,k,v) => setEntries(es=>es.map((e,j)=>j===i?{...e,[k]:v}:e));
+  const addEntry = () => setEntries(es=>[...es, EMPTY_ENTRY()]);
+  const removeEntry = i => setEntries(es=>es.filter((_,j)=>j!==i));
+
+  const reset = () => {
+    setMemberId(""); setProjectId(""); setDate(today);
+    setEntries([EMPTY_ENTRY()]); setSubmitted(false); setError("");
+  };
+
+  const handleSubmit = () => {
+    if (!memberId)  { setError("名前を選択してください"); return; }
+    if (!projectId) { setError("案件を選択してください"); return; }
+    if (entries.some(e=>!e.listName)) { setError("リスト名を入力してください"); return; }
+    if (entries.some(e=>!e.calls))    { setError("架電数を入力してください"); return; }
+    setError("");
+    onSubmit({id:Date.now().toString(), createdAt:new Date().toISOString(), date, memberId, projectId, entries});
+    setSubmitted(true);
+  };
+
+  if (submitted) return (
+    <div style={{maxWidth:600,margin:"0 auto"}}>
+      <div className="success-msg">✅ 報告を送信しました！お疲れ様でした。</div>
+      <div style={{textAlign:"center"}}><button className="btn btn-primary" onClick={reset}>続けて報告する</button></div>
+    </div>
+  );
+
+  return (
+    <div style={{maxWidth:660,margin:"0 auto"}}>
+      <div className="sec-title" style={{marginBottom:16}}>📋 日次報告入力</div>
+      {error && <div className="error-msg">{error}</div>}
+      <div className="card">
+        <div className="grid2" style={{gap:12,marginBottom:12}}>
+          <div><label className="form-label">日付</label>
+            <input className="form-input" type="date" value={date} onChange={e=>setDate(e.target.value)}/></div>
+          <div><label className="form-label">名前</label>
+            <select className="form-select" value={memberId} onChange={e=>{setMemberId(e.target.value);setProjectId("");}}>
+              <option value="">選択してください</option>
+              {members.map(m=><option key={m.id} value={m.id}>{m.name}</option>)}
+            </select></div>
+        </div>
+        <div><label className="form-label">案件{!memberId&&<span style={{color:"var(--muted)",fontWeight:400}}>（先に名前を選んでください）</span>}</label>
+          <select className="form-select" value={projectId} onChange={e=>setProjectId(e.target.value)} disabled={!memberId}>
+            <option value="">選択してください</option>
+            {memberProjects.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}
+          </select></div>
+      </div>
+
+      {entries.map((entry,i)=>(
+        <div className="list-entry" key={i} style={{marginTop:12}}>
+          <div className="list-entry-header">
+            <span className="list-entry-title">リスト {i+1}</span>
+            {entries.length>1 && <button className="btn btn-danger" onClick={()=>removeEntry(i)}>削除</button>}
+          </div>
+          <div style={{marginBottom:12}}>
+            <label className="form-label">リスト名</label>
+            {listOptions.length>0
+              ? <select className="form-select" value={entry.listName} onChange={e=>setEntry(i,"listName",e.target.value)}>
+                  <option value="">選択してください</option>
+                  {listOptions.map(l=><option key={l} value={l}>{l}</option>)}
+                </select>
+              : <input className="form-input" placeholder="例：リストA-1" value={entry.listName} onChange={e=>setEntry(i,"listName",e.target.value)}/>
+            }
+          </div>
+          <div className="call-grid">
+            {CALL_FIELDS.map(f=>(
+              <div className="call-field" key={f.key}>
+                <label style={{color:f.color!=="var(--text)"?f.color:"var(--muted)"}}>{f.label}</label>
+                <input type="number" min="0" placeholder="0" value={entry[f.key]}
+                  onChange={e=>setEntry(i,f.key,e.target.value)}
+                  style={{color:f.color!=="var(--text)"?f.color:"var(--text)"}}/>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+
+      <div style={{display:"flex",gap:10,marginTop:12,justifyContent:"space-between"}}>
+        <button className="btn btn-ghost" onClick={addEntry}>＋ リストを追加</button>
+        <button className="btn btn-primary" onClick={handleSubmit} style={{minWidth:130}}>送信する →</button>
+      </div>
+    </div>
+  );
+}
+
+// ===== REPORTS LIST =====
+function ReportsView({members, projects, reports, onDelete}) {
+  const [fp, setFp] = useState("all");
+  const [fm, setFm] = useState("all");
+  const [expandedId, setExpandedId] = useState(null);
+  const getM = id => members.find(m=>m.id===id)?.name||id;
+  const getP = id => projects.find(p=>p.id===id)?.name||id;
+
+  const filtered = reports.filter(r=>{
+    if (fp!=="all" && r.projectId!==fp) return false;
+    if (fm!=="all" && r.memberId!==fm) return false;
+    return true;
+  }).sort((a,b)=>b.date?.localeCompare(a.date));
+
+  return (
+    <div>
+      <div className="sec-header">
+        <div className="sec-title">🗂 報告一覧</div>
+        <span className="badge badge-blue">{filtered.length}件</span>
+      </div>
+      <div className="filter-row">
+        <select value={fp} onChange={e=>setFp(e.target.value)}>
+          <option value="all">全案件</option>
+          {projects.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}
+        </select>
+        <select value={fm} onChange={e=>setFm(e.target.value)}>
+          <option value="all">全メンバー</option>
+          {members.map(m=><option key={m.id} value={m.id}>{m.name}</option>)}
+        </select>
+      </div>
+      <div className="card">
+        <div className="tbl-wrap">
+          <table>
+            <thead><tr><th></th><th>日付</th><th>名前</th><th>案件</th><th>リスト数</th><th>架電</th><th>アポ</th><th>アポ率</th><th>通電率</th><th></th></tr></thead>
+            <tbody>
+              {filtered.length===0 && <tr><td colSpan={10} className="empty">報告がありません</td></tr>}
+              {filtered.map(r=>{
+                const s = calcStats([r]);
+                const isExp = expandedId===r.id;
+                return (
+                  <React.Fragment key={r.id}>
+                    <tr>
+                      <td><button className="expand-btn" onClick={()=>setExpandedId(isExp?null:r.id)}>{isExp?"▲":"▼"}</button></td>
+                      <td>{r.date}</td>
+                      <td style={{fontWeight:600}}>{getM(r.memberId)}</td>
+                      <td><span className="badge badge-blue">{getP(r.projectId)}</span></td>
+                      <td><span className="badge badge-cyan">{(r.entries||[]).length}リスト</span></td>
+                      <td>{s.calls}</td>
+                      <td style={{color:"var(--accent)",fontWeight:700}}>{s.appo}</td>
+                      <td>{s.appoRate}%</td>
+                      <td>{s.connectRate}%</td>
+                      <td><button className="btn btn-danger" onClick={()=>onDelete(r.id)}>削除</button></td>
+                    </tr>
+                    {isExp && (r.entries||[]).map((e,i)=>{
+                      const es = calcStats([{entries:[e]}]);
+                      return (
+                        <tr key={i} style={{background:"rgba(30,37,53,.5)"}}>
+                          <td></td><td></td><td></td>
+                          <td style={{color:"var(--accent2)",fontSize:12}}>└ {e.listName}</td>
+                          <td></td>
+                          <td style={{fontSize:12}}>{Number(e.calls)||0}</td>
+                          <td style={{color:"var(--accent)",fontSize:12,fontWeight:700}}>{Number(e.appo)||0}</td>
+                          <td style={{fontSize:12}}>{es.appoRate}%</td>
+                          <td style={{fontSize:12}}>{es.connectRate}%</td>
+                          <td></td>
+                        </tr>
+                      );
+                    })}
+                  </React.Fragment>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ===== ADMIN =====
+function AdminView({members, projects, onSaveMembers, onSaveProjects}) {
+  const [lm, setLm] = useState(members);
+  const [lp, setLp] = useState(projects);
+  const [newM, setNewM] = useState("");
+  const [newP, setNewP] = useState({name:"",targetAppo:"",memberIds:[],lists:[]});
+  const [listInputs, setListInputs] = useState({});
+  const [savedMsg, setSavedMsg] = useState("");
+
+  const save = () => {
+    onSaveMembers(lm); onSaveProjects(lp);
+    setSavedMsg("保存しました！"); setTimeout(()=>setSavedMsg(""),2000);
+  };
+  const addM = () => { if (!newM.trim()) return; setLm(ms=>[...ms,{id:Date.now().toString(),name:newM.trim()}]); setNewM(""); };
+  const addP = () => {
+    if (!newP.name.trim()) return;
+    setLp(ps=>[...ps,{...newP,id:Date.now().toString(),targetAppo:Number(newP.targetAppo)||0}]);
+    setNewP({name:"",targetAppo:"",memberIds:[],lists:[]});
+  };
+  const toggleM = (mId, pidx) => setLp(ps=>ps.map((p,i)=>{
+    if (i!==pidx) return p;
+    const ids = p.memberIds?.includes(mId)?p.memberIds.filter(x=>x!==mId):[...(p.memberIds||[]),mId];
+    return {...p,memberIds:ids};
+  }));
+  const addList = (pidx) => {
+    const v = (listInputs[pidx]||"").trim(); if (!v) return;
+    setLp(ps=>ps.map((p,i)=>i===pidx?{...p,lists:[...(p.lists||[]),v]}:p));
+    setListInputs(s=>({...s,[pidx]:""}));
+  };
+  const removeList = (pidx,lidx) => setLp(ps=>ps.map((p,i)=>i===pidx?{...p,lists:p.lists.filter((_,j)=>j!==lidx)}:p));
+
+  return (
+    <div>
+      <div className="sec-header">
+        <div className="sec-title">⚙️ マスタ管理</div>
+        <button className="btn btn-green" onClick={save}>保存する</button>
+      </div>
+      {savedMsg && <div className="success-msg">{savedMsg}</div>}
+
+      <div className="card" style={{marginBottom:16}}>
+        <div className="card-title">メンバー管理</div>
+        <div style={{display:"flex",gap:8,marginBottom:12}}>
+          <input className="form-input" style={{flex:1}} placeholder="新規メンバー名" value={newM}
+            onChange={e=>setNewM(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addM()}/>
+          <button className="btn btn-primary" onClick={addM}>追加</button>
+        </div>
+        <div className="tbl-wrap">
+          <table>
+            <thead><tr><th>名前</th><th></th></tr></thead>
+            <tbody>
+              {lm.map((m,i)=>(
+                <tr key={m.id}>
+                  <td><input className="form-input" value={m.name} style={{maxWidth:260}}
+                    onChange={e=>setLm(ms=>ms.map((x,j)=>j===i?{...x,name:e.target.value}:x))}/></td>
+                  <td><button className="btn btn-danger" onClick={()=>setLm(ms=>ms.filter((_,j)=>j!==i))}>削除</button></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="card-title">案件管理</div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr auto auto",gap:8,marginBottom:14}}>
+          <input className="form-input" placeholder="案件名" value={newP.name} onChange={e=>setNewP(p=>({...p,name:e.target.value}))}/>
+          <input className="form-input" placeholder="目標アポ数" type="number" style={{width:100}} value={newP.targetAppo} onChange={e=>setNewP(p=>({...p,targetAppo:e.target.value}))}/>
+          <button className="btn btn-primary" onClick={addP}>追加</button>
+        </div>
+        {lp.map((p,pidx)=>(
+          <div key={p.id} style={{background:"var(--surface2)",border:"1px solid var(--border)",borderRadius:10,padding:14,marginBottom:10}}>
+            <div style={{display:"grid",gridTemplateColumns:"1fr auto auto",gap:8,marginBottom:10,alignItems:"center"}}>
+              <input className="form-input" value={p.name}
+                onChange={e=>setLp(ps=>ps.map((x,j)=>j===pidx?{...x,name:e.target.value}:x))}/>
+              <div style={{display:"flex",alignItems:"center",gap:6}}>
+                <span style={{fontSize:11,color:"var(--muted)",whiteSpace:"nowrap"}}>目標アポ</span>
+                <input className="form-input" type="number" style={{width:70}} value={p.targetAppo}
+                  onChange={e=>setLp(ps=>ps.map((x,j)=>j===pidx?{...x,targetAppo:Number(e.target.value)}:x))}/>
+              </div>
+              <button className="btn btn-danger" onClick={()=>setLp(ps=>ps.filter((_,j)=>j!==pidx))}>削除</button>
+            </div>
+            <div style={{fontSize:11,color:"var(--muted)",marginBottom:6}}>担当メンバー</div>
+            <div style={{marginBottom:12,display:"flex",flexWrap:"wrap",gap:4}}>
+              {lm.map(m=>(
+                <span key={m.id} className={`member-tag ${p.memberIds?.includes(m.id)?"selected":""}`}
+                  onClick={()=>toggleM(m.id,pidx)}>{m.name}</span>
+              ))}
+            </div>
+            <div style={{fontSize:11,color:"var(--muted)",marginBottom:8}}>リスト管理</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:8}}>
+              {(p.lists||[]).map((l,lidx)=>(
+                <span key={lidx} className="list-chip">{l}
+                  <span className="list-chip-x" onClick={()=>removeList(pidx,lidx)}>×</span>
+                </span>
+              ))}
+              {!(p.lists||[]).length && <span style={{fontSize:12,color:"var(--muted)"}}>リストなし</span>}
+            </div>
+            <div style={{display:"flex",gap:8}}>
+              <input className="form-input" style={{flex:1}} placeholder="新規リスト名（例：リストA-3）"
+                value={listInputs[pidx]||""}
+                onChange={e=>setListInputs(s=>({...s,[pidx]:e.target.value}))}
+                onKeyDown={e=>e.key==="Enter"&&addList(pidx)}/>
+              <button className="btn btn-ghost" onClick={()=>addList(pidx)}>＋追加</button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ===== ROOT =====
+function App() {
+  const [tab, setTab] = useState("report");
+  const [members,  setMembers]  = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [reports,  setReports]  = useState([]);
+  const [loaded,   setLoaded]   = useState(false);
+
+  useEffect(()=>{
+    setMembers(LS.get("is_members")||DEFAULT_MEMBERS);
+    setProjects(LS.get("is_projects")||DEFAULT_PROJECTS);
+    setReports(LS.get("is_reports")||[]);
+    setLoaded(true);
+  },[]);
+
+  const saveMembers  = useCallback(m=>{setMembers(m);  LS.set("is_members",m);},[]);
+  const saveProjects = useCallback(p=>{setProjects(p); LS.set("is_projects",p);},[]);
+  const addReport    = useCallback(r=>{setReports(rs=>{const u=[...rs,r]; LS.set("is_reports",u); return u;});},[]);
+  const deleteReport = useCallback(id=>{setReports(rs=>{const u=rs.filter(r=>r.id!==id); LS.set("is_reports",u); return u;});},[]);
+
+  const tabs=[
+    {key:"report",    label:"📋 日次報告"},
+    {key:"dashboard", label:"📊 ダッシュボード"},
+    {key:"reports",   label:"🗂 報告一覧"},
+    {key:"admin",     label:"⚙️ マスタ管理"},
+  ];
+
+  if (!loaded) return <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:"var(--bg)",color:"var(--muted)"}}>読み込み中...</div>;
+
+  return (
+    <div className="app">
+      <nav className="nav">
+        <span className="nav-logo">IS·MGR</span>
+        {tabs.map(t=>(
+          <button key={t.key} className={`nav-tab ${tab===t.key?"active":""}`} onClick={()=>setTab(t.key)}>{t.label}</button>
+        ))}
+      </nav>
+      <main className="main">
+        {tab==="dashboard" && <DashboardView members={members} projects={projects} reports={reports}/>}
+        {tab==="report"    && <ReportFormView members={members} projects={projects} onSubmit={addReport}/>}
+        {tab==="reports"   && <ReportsView    members={members} projects={projects} reports={reports} onDelete={deleteReport}/>}
+        {tab==="admin"     && <AdminView       members={members} projects={projects} onSaveMembers={saveMembers} onSaveProjects={saveProjects}/>}
+      </main>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
