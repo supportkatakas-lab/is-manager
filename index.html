@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>IS Manager</title>
+<title>IS日次報告</title>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -11,71 +11,90 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --bg:#0d0f14;--surface:#161923;--surface2:#1e2535;--border:#2a3148;
-  --accent:#3b82f6;--accent2:#22d3ee;--green:#10b981;--yellow:#f59e0b;--red:#ef4444;
-  --text:#e2e8f0;--muted:#64748b;--radius:10px;
+  --bg:#f5f7fa;
+  --surface:#ffffff;
+  --surface2:#f0f3f8;
+  --border:#dde3ed;
+  --accent:#2563eb;
+  --accent2:#0891b2;
+  --green:#059669;
+  --yellow:#d97706;
+  --red:#dc2626;
+  --text:#1e293b;
+  --muted:#64748b;
+  --radius:10px;
 }
 body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-serif;min-height:100vh;}
 .app{display:flex;flex-direction:column;min-height:100vh;}
-.nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px;display:flex;align-items:center;gap:6px;min-height:56px;position:sticky;top:0;z-index:100;flex-wrap:wrap;}
-.nav-logo{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--accent2);letter-spacing:2px;margin-right:12px;white-space:nowrap;}
-.nav-tab{background:none;border:none;color:var(--muted);font-family:'Noto Sans JP',sans-serif;font-size:13px;font-weight:500;padding:6px 12px;border-radius:6px;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.nav{background:#fff;border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;gap:6px;min-height:56px;position:sticky;top:0;z-index:100;flex-wrap:wrap;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+.nav-logo{font-family:'Noto Sans JP',sans-serif;font-size:15px;font-weight:700;color:var(--accent);margin-right:16px;white-space:nowrap;letter-spacing:.5px;}
+.nav-tab{background:none;border:none;color:var(--muted);font-family:'Noto Sans JP',sans-serif;font-size:13px;font-weight:500;padding:6px 14px;border-radius:6px;cursor:pointer;transition:all .2s;white-space:nowrap;}
 .nav-tab:hover{background:var(--surface2);color:var(--text);}
 .nav-tab.active{background:var(--accent);color:#fff;}
-.main{flex:1;padding:24px 16px;max-width:1200px;margin:0 auto;width:100%;}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;}
+.main{flex:1;padding:24px 20px;max-width:1200px;margin:0 auto;width:100%;}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.04);}
 .card+.card{margin-top:16px;}
 .card-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
 @media(max-width:700px){.grid2,.grid4{grid-template-columns:1fr 1fr;}}
-.stat{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;}
-.stat-label{font-size:11px;color:var(--muted);margin-bottom:4px;}
-.stat-value{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;}
-.progress-bar{height:5px;background:var(--border);border-radius:999px;overflow:hidden;margin-top:4px;}
+.stat{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px;}
+.stat-label{font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:600;}
+.stat-value{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:var(--text);}
+.stat-value.blue{color:var(--accent);}
+.stat-value.green{color:var(--green);}
+.stat-value.yellow{color:var(--yellow);}
+.stat-value.cyan{color:var(--accent2);}
+.progress-bar{height:5px;background:var(--border);border-radius:999px;overflow:hidden;margin-top:5px;}
 .progress-fill{height:100%;border-radius:999px;transition:width .5s;}
 .tbl-wrap{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:13px;}
-th{padding:9px 12px;text-align:left;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;border-bottom:1px solid var(--border);white-space:nowrap;}
-td{padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap;}
+th{padding:9px 12px;text-align:left;color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;border-bottom:2px solid var(--border);white-space:nowrap;background:#fafbfc;}
+td{padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap;color:var(--text);}
 tr:last-child td{border-bottom:none;}
-tr:hover td{background:var(--surface2);}
-.form-label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:5px;}
-.form-input,.form-select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:14px;padding:8px 12px;outline:none;transition:border .2s;}
+tr:hover td{background:#f8faff;}
+.form-label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;}
+.form-input,.form-select{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:7px;color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:14px;padding:8px 12px;outline:none;transition:border .2s;}
 .form-input:focus,.form-select:focus{border-color:var(--accent);}
-.form-select option{background:var(--surface2);}
+.form-input:disabled,.form-select:disabled{background:var(--surface2);color:var(--muted);cursor:not-allowed;}
 .call-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
 @media(min-width:480px){.call-grid{grid-template-columns:repeat(4,1fr);}}
-.call-field{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;}
-.call-field label{display:block;font-size:10px;font-weight:600;margin-bottom:4px;}
+.call-field{background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:10px;transition:border .2s;}
+.call-field:focus-within{border-color:var(--accent);}
+.call-field label{display:block;font-size:10px;font-weight:700;margin-bottom:4px;color:var(--muted);}
 .call-field input{width:100%;background:transparent;border:none;color:var(--text);font-family:'Space Mono',monospace;font-size:20px;font-weight:700;outline:none;}
-.btn{border:none;border-radius:7px;font-family:'Noto Sans JP',sans-serif;font-size:14px;font-weight:700;padding:9px 18px;cursor:pointer;transition:all .2s;}
+.btn{border:none;border-radius:7px;font-family:'Noto Sans JP',sans-serif;font-size:14px;font-weight:700;padding:9px 18px;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px;}
 .btn-primary{background:var(--accent);color:#fff;}
-.btn-primary:hover{background:#2563eb;}
-.btn-danger{background:transparent;border:1px solid var(--red);color:var(--red);font-size:12px;padding:5px 10px;}
+.btn-primary:hover{background:#1d4ed8;}
+.btn-danger{background:transparent;border:1.5px solid var(--red);color:var(--red);font-size:12px;padding:5px 10px;}
 .btn-danger:hover{background:var(--red);color:#fff;}
-.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted);font-size:13px;padding:7px 14px;}
-.btn-ghost:hover{border-color:var(--accent2);color:var(--accent2);}
+.btn-ghost{background:transparent;border:1.5px solid var(--border);color:var(--muted);font-size:13px;padding:7px 14px;}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
 .btn-green{background:var(--green);color:#fff;}
-.btn-green:hover{opacity:.85;}
-.badge{display:inline-block;border-radius:99px;font-size:11px;font-weight:700;padding:2px 8px;}
-.badge-blue{background:rgba(59,130,246,.15);color:var(--accent);}
-.badge-cyan{background:rgba(34,211,238,.12);color:var(--accent2);}
-.sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.sec-title{font-size:16px;font-weight:700;}
-.success-msg{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:8px;padding:14px;color:var(--green);font-weight:600;text-align:center;margin-bottom:16px;}
-.error-msg{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:12px;color:var(--red);margin-bottom:14px;font-size:13px;}
-.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
-.filter-row select{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:7px 12px;font-size:13px;font-family:'Noto Sans JP',sans-serif;outline:none;}
+.btn-green:hover{background:#047857;}
+.btn-export{background:#fff;border:1.5px solid var(--green);color:var(--green);font-size:13px;padding:7px 14px;font-weight:700;}
+.btn-export:hover{background:var(--green);color:#fff;}
+.badge{display:inline-block;border-radius:99px;font-size:11px;font-weight:700;padding:2px 9px;}
+.badge-blue{background:#eff6ff;color:var(--accent);}
+.badge-cyan{background:#ecfeff;color:var(--accent2);}
+.badge-green{background:#f0fdf4;color:var(--green);}
+.sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
+.sec-title{font-size:17px;font-weight:700;color:var(--text);}
+.success-msg{background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:8px;padding:14px;color:var(--green);font-weight:700;text-align:center;margin-bottom:16px;}
+.error-msg{background:#fef2f2;border:1.5px solid #fecaca;border-radius:8px;padding:12px;color:var(--red);margin-bottom:14px;font-size:13px;font-weight:600;}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center;}
+.filter-row select{background:#fff;border:1.5px solid var(--border);color:var(--text);border-radius:7px;padding:7px 12px;font-size:13px;font-family:'Noto Sans JP',sans-serif;outline:none;transition:border .2s;}
+.filter-row select:focus{border-color:var(--accent);}
 .empty{text-align:center;padding:32px;color:var(--muted);font-size:14px;}
-.member-tag{background:var(--surface2);border:1px solid var(--border);border-radius:4px;font-size:11px;padding:2px 8px;color:var(--muted);cursor:pointer;display:inline-block;margin:2px;}
-.member-tag.selected{background:rgba(59,130,246,.2);border-color:var(--accent);color:var(--accent);}
-.list-entry{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;}
+.member-tag{background:var(--surface2);border:1.5px solid var(--border);border-radius:5px;font-size:12px;padding:3px 10px;color:var(--muted);cursor:pointer;display:inline-block;margin:2px;transition:all .2s;font-weight:500;}
+.member-tag.selected{background:#eff6ff;border-color:var(--accent);color:var(--accent);}
+.list-entry{background:#f8faff;border:1.5px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px;}
 .list-entry-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
 .list-entry-title{font-size:13px;font-weight:700;color:var(--accent2);}
-.list-chip{background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.25);border-radius:6px;padding:3px 10px;font-size:12px;color:var(--accent2);display:inline-flex;align-items:center;gap:6px;margin:2px;}
-.list-chip-x{cursor:pointer;color:var(--red);font-weight:700;}
-.expand-btn{background:none;border:none;color:var(--accent);cursor:pointer;font-size:12px;padding:2px 6px;}
+.list-chip{background:#ecfeff;border:1px solid #a5f3fc;border-radius:6px;padding:3px 10px;font-size:12px;color:var(--accent2);display:inline-flex;align-items:center;gap:6px;margin:2px;font-weight:600;}
+.list-chip-x{cursor:pointer;color:var(--red);font-weight:700;font-size:14px;}
+.expand-btn{background:none;border:none;color:var(--accent);cursor:pointer;font-size:12px;padding:2px 6px;font-weight:700;}
+.divider{height:1px;background:var(--border);margin:20px 0;}
 </style>
 </head>
 <body>
@@ -83,7 +102,7 @@ tr:hover td{background:var(--surface2);}
 <script type="text/babel">
 const {useState, useEffect, useCallback} = React;
 
-// ===== STORAGE (localStorage for standalone deployment) =====
+// ===== STORAGE: localStorage (persists across days/sessions) =====
 const LS = {
   get: (k) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch { return null; } },
   set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) { console.error(e); } },
@@ -128,12 +147,35 @@ function calcStats(reports) {
   };
 }
 
+// ===== CSV EXPORT =====
+function exportToCSV(reports, members, projects) {
+  const getM = id => members.find(m=>m.id===id)?.name||id;
+  const getP = id => projects.find(p=>p.id===id)?.name||id;
+  const rows = [["日付","名前","案件名","リスト名","架電数","アポ数","本人資料請求","不通","本人不在","本人拒否","受付拒否","受付資料請求","アポ率(%)","通電率(%)","CA率(%)"]];
+  reports.sort((a,b)=>a.date?.localeCompare(b.date)).forEach(r => {
+    (r.entries||[]).forEach(e => {
+      const s = calcStats([{entries:[e]}]);
+      rows.push([r.date, getM(r.memberId), getP(r.projectId), e.listName,
+        Number(e.calls)||0, Number(e.appo)||0, Number(e.materialSelf)||0,
+        Number(e.noAnswer)||0, Number(e.absent)||0, Number(e.rejectedSelf)||0,
+        Number(e.rejectedReception)||0, Number(e.materialReception)||0,
+        s.appoRate, s.connectRate, s.caRate]);
+    });
+  });
+  const bom = "\uFEFF";
+  const csv = bom + rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
+  const blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = `IS報告_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+}
+
 // ===== DASHBOARD =====
 function DashboardView({members, projects, reports}) {
   const [fp, setFp] = useState("all");
   const [fm, setFm] = useState("all");
   const [fmo, setFmo] = useState("all");
-  const [expandedId, setExpandedId] = useState(null);
 
   const months = [...new Set(reports.map(r=>r.date?.slice(0,7)))].sort().reverse();
   const filtered = reports.filter(r => {
@@ -143,10 +185,8 @@ function DashboardView({members, projects, reports}) {
     return true;
   });
   const overall = calcStats(filtered);
-  const getM = id => members.find(m=>m.id===id)?.name||id;
   const getP = id => projects.find(p=>p.id===id)?.name||id;
 
-  // list breakdown
   const listMap = {};
   filtered.forEach(r => {
     (r.entries||[]).forEach(e => {
@@ -158,7 +198,12 @@ function DashboardView({members, projects, reports}) {
 
   return (
     <div>
-      <div className="sec-header"><div className="sec-title">📊 ダッシュボード</div></div>
+      <div className="sec-header">
+        <div className="sec-title">📊 ダッシュボード</div>
+        <button className="btn btn-export" onClick={()=>exportToCSV(filtered, members, projects)}>
+          ⬇️ CSVエクスポート
+        </button>
+      </div>
       <div className="filter-row">
         <select value={fp} onChange={e=>setFp(e.target.value)}>
           <option value="all">全案件</option>
@@ -178,18 +223,18 @@ function DashboardView({members, projects, reports}) {
         <div className="card-title">全体サマリー（{filtered.length}件の報告）</div>
         <div className="grid4">
           {[
-            {label:"架電数",       val:overall.calls.toLocaleString(), col:"var(--text)"},
-            {label:"アポ数",       val:overall.appo,                   col:"var(--accent)"},
-            {label:"アポ率",       val:overall.appoRate+"%",           col:"var(--green)"},
-            {label:"通電率",       val:overall.connectRate+"%",        col:"var(--yellow)"},
-            {label:"CA率",         val:overall.caRate+"%",             col:"var(--accent2)"},
-            {label:"本人資料請求", val:overall.materialSelf,           col:"var(--text)"},
-            {label:"受付資料請求", val:overall.materialReception,      col:"var(--text)"},
-            {label:"不通",         val:overall.noAnswer,               col:"var(--muted)"},
+            {label:"架電数",       val:overall.calls.toLocaleString(), cls:""},
+            {label:"アポ数",       val:overall.appo,                   cls:"blue"},
+            {label:"アポ率",       val:overall.appoRate+"%",           cls:"green"},
+            {label:"通電率",       val:overall.connectRate+"%",        cls:"yellow"},
+            {label:"CA率",         val:overall.caRate+"%",             cls:"cyan"},
+            {label:"本人資料請求", val:overall.materialSelf,           cls:""},
+            {label:"受付資料請求", val:overall.materialReception,      cls:""},
+            {label:"不通",         val:overall.noAnswer,               cls:""},
           ].map(s=>(
             <div className="stat" key={s.label}>
               <div className="stat-label">{s.label}</div>
-              <div className="stat-value" style={{color:s.col}}>{s.val}</div>
+              <div className={`stat-value ${s.cls}`}>{s.val}</div>
             </div>
           ))}
         </div>
@@ -204,10 +249,10 @@ function DashboardView({members, projects, reports}) {
               {projects.map(p=>{
                 const s = calcStats(filtered.filter(r=>r.projectId===p.id));
                 const pct = p.targetAppo>0 ? Math.min(100,s.appo/p.targetAppo*100).toFixed(0) : 0;
-                const col = pct>=80?"var(--green)":pct>=50?"var(--yellow)":"var(--accent)";
+                const col = pct>=80?var_green:pct>=50?var_yellow:var_accent;
                 return (
                   <tr key={p.id}>
-                    <td style={{fontWeight:600}}>{p.name}</td>
+                    <td style={{fontWeight:700}}>{p.name}</td>
                     <td>{p.targetAppo}</td>
                     <td style={{color:"var(--accent)",fontWeight:700}}>{s.appo}</td>
                     <td><span style={{fontSize:12,fontWeight:700,color:col}}>{pct}%</span>
@@ -233,7 +278,7 @@ function DashboardView({members, projects, reports}) {
                   return (
                     <tr key={i}>
                       <td><span className="badge badge-blue">{getP(ls.projectId)}</span></td>
-                      <td style={{color:"var(--accent2)",fontWeight:600}}>{ls.listName}</td>
+                      <td style={{color:"var(--accent2)",fontWeight:700}}>{ls.listName}</td>
                       <td>{s.calls}</td>
                       <td style={{color:"var(--accent)",fontWeight:700}}>{s.appo}</td>
                       <td>{s.materialSelf}</td>
@@ -242,8 +287,7 @@ function DashboardView({members, projects, reports}) {
                       <td style={{color:"var(--red)"}}>{s.rejectedSelf}</td>
                       <td style={{color:"var(--red)"}}>{s.rejectedReception}</td>
                       <td>{s.materialReception}</td>
-                      <td>{s.appoRate}%</td>
-                      <td>{s.connectRate}%</td>
+                      <td>{s.appoRate}%</td><td>{s.connectRate}%</td>
                     </tr>
                   );
                 })}
@@ -265,7 +309,7 @@ function DashboardView({members, projects, reports}) {
                 const s = calcStats(mr);
                 return (
                   <tr key={m.id}>
-                    <td style={{fontWeight:600}}>{m.name}</td>
+                    <td style={{fontWeight:700}}>{m.name}</td>
                     <td><span className="badge badge-blue">{mr.length}日</span></td>
                     <td>{s.calls}</td>
                     <td style={{color:"var(--accent)",fontWeight:700}}>{s.appo}</td>
@@ -302,15 +346,12 @@ function ReportFormView({members, projects, onSubmit}) {
   const addEntry = () => setEntries(es=>[...es, EMPTY_ENTRY()]);
   const removeEntry = i => setEntries(es=>es.filter((_,j)=>j!==i));
 
-  const reset = () => {
-    setMemberId(""); setProjectId(""); setDate(today);
-    setEntries([EMPTY_ENTRY()]); setSubmitted(false); setError("");
-  };
+  const reset = () => { setMemberId(""); setProjectId(""); setDate(today); setEntries([EMPTY_ENTRY()]); setSubmitted(false); setError(""); };
 
   const handleSubmit = () => {
     if (!memberId)  { setError("名前を選択してください"); return; }
     if (!projectId) { setError("案件を選択してください"); return; }
-    if (entries.some(e=>!e.listName)) { setError("リスト名を入力してください"); return; }
+    if (entries.some(e=>!e.listName)) { setError("すべてのリスト名を入力してください"); return; }
     if (entries.some(e=>!e.calls))    { setError("架電数を入力してください"); return; }
     setError("");
     onSubmit({id:Date.now().toString(), createdAt:new Date().toISOString(), date, memberId, projectId, entries});
@@ -327,9 +368,9 @@ function ReportFormView({members, projects, onSubmit}) {
   return (
     <div style={{maxWidth:660,margin:"0 auto"}}>
       <div className="sec-title" style={{marginBottom:16}}>📋 日次報告入力</div>
-      {error && <div className="error-msg">{error}</div>}
+      {error && <div className="error-msg">⚠️ {error}</div>}
       <div className="card">
-        <div className="grid2" style={{gap:12,marginBottom:12}}>
+        <div className="grid2" style={{gap:12,marginBottom:14}}>
           <div><label className="form-label">日付</label>
             <input className="form-input" type="date" value={date} onChange={e=>setDate(e.target.value)}/></div>
           <div><label className="form-label">名前</label>
@@ -338,17 +379,21 @@ function ReportFormView({members, projects, onSubmit}) {
               {members.map(m=><option key={m.id} value={m.id}>{m.name}</option>)}
             </select></div>
         </div>
-        <div><label className="form-label">案件{!memberId&&<span style={{color:"var(--muted)",fontWeight:400}}>（先に名前を選んでください）</span>}</label>
+        <div><label className="form-label">
+          案件
+          {!memberId && <span style={{color:"var(--muted)",fontWeight:400,fontSize:11}}> ← 先に名前を選んでください</span>}
+        </label>
           <select className="form-select" value={projectId} onChange={e=>setProjectId(e.target.value)} disabled={!memberId}>
             <option value="">選択してください</option>
             {memberProjects.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}
-          </select></div>
+          </select>
+        </div>
       </div>
 
       {entries.map((entry,i)=>(
         <div className="list-entry" key={i} style={{marginTop:12}}>
           <div className="list-entry-header">
-            <span className="list-entry-title">リスト {i+1}</span>
+            <span className="list-entry-title">📁 リスト {i+1}</span>
             {entries.length>1 && <button className="btn btn-danger" onClick={()=>removeEntry(i)}>削除</button>}
           </div>
           <div style={{marginBottom:12}}>
@@ -358,23 +403,24 @@ function ReportFormView({members, projects, onSubmit}) {
                   <option value="">選択してください</option>
                   {listOptions.map(l=><option key={l} value={l}>{l}</option>)}
                 </select>
-              : <input className="form-input" placeholder="例：リストA-1" value={entry.listName} onChange={e=>setEntry(i,"listName",e.target.value)}/>
+              : <input className="form-input" placeholder="案件を先に選んでください" value={entry.listName}
+                  onChange={e=>setEntry(i,"listName",e.target.value)} disabled={!projectId}/>
             }
           </div>
           <div className="call-grid">
             {CALL_FIELDS.map(f=>(
               <div className="call-field" key={f.key}>
-                <label style={{color:f.color!=="var(--text)"?f.color:"var(--muted)"}}>{f.label}</label>
+                <label style={{color:f.color!=="var(--text)"&&f.color!=="var(--muted)"?f.color:"var(--muted)"}}>{f.label}</label>
                 <input type="number" min="0" placeholder="0" value={entry[f.key]}
                   onChange={e=>setEntry(i,f.key,e.target.value)}
-                  style={{color:f.color!=="var(--text)"?f.color:"var(--text)"}}/>
+                  style={{color:f.color!=="var(--text)"&&f.color!=="var(--muted)"?f.color:"var(--text)"}}/>
               </div>
             ))}
           </div>
         </div>
       ))}
 
-      <div style={{display:"flex",gap:10,marginTop:12,justifyContent:"space-between"}}>
+      <div style={{display:"flex",gap:10,marginTop:14,justifyContent:"space-between"}}>
         <button className="btn btn-ghost" onClick={addEntry}>＋ リストを追加</button>
         <button className="btn btn-primary" onClick={handleSubmit} style={{minWidth:130}}>送信する →</button>
       </div>
@@ -400,7 +446,10 @@ function ReportsView({members, projects, reports, onDelete}) {
     <div>
       <div className="sec-header">
         <div className="sec-title">🗂 報告一覧</div>
-        <span className="badge badge-blue">{filtered.length}件</span>
+        <div style={{display:"flex",gap:8,alignItems:"center"}}>
+          <span className="badge badge-blue">{filtered.length}件</span>
+          <button className="btn btn-export" onClick={()=>exportToCSV(filtered, members, projects)}>⬇️ CSVエクスポート</button>
+        </div>
       </div>
       <div className="filter-row">
         <select value={fp} onChange={e=>setFp(e.target.value)}>
@@ -426,7 +475,7 @@ function ReportsView({members, projects, reports, onDelete}) {
                     <tr>
                       <td><button className="expand-btn" onClick={()=>setExpandedId(isExp?null:r.id)}>{isExp?"▲":"▼"}</button></td>
                       <td>{r.date}</td>
-                      <td style={{fontWeight:600}}>{getM(r.memberId)}</td>
+                      <td style={{fontWeight:700}}>{getM(r.memberId)}</td>
                       <td><span className="badge badge-blue">{getP(r.projectId)}</span></td>
                       <td><span className="badge badge-cyan">{(r.entries||[]).length}リスト</span></td>
                       <td>{s.calls}</td>
@@ -438,9 +487,9 @@ function ReportsView({members, projects, reports, onDelete}) {
                     {isExp && (r.entries||[]).map((e,i)=>{
                       const es = calcStats([{entries:[e]}]);
                       return (
-                        <tr key={i} style={{background:"rgba(30,37,53,.5)"}}>
+                        <tr key={i} style={{background:"#f8faff"}}>
                           <td></td><td></td><td></td>
-                          <td style={{color:"var(--accent2)",fontSize:12}}>└ {e.listName}</td>
+                          <td style={{color:"var(--accent2)",fontSize:12,fontWeight:600}}>└ {e.listName}</td>
                           <td></td>
                           <td style={{fontSize:12}}>{Number(e.calls)||0}</td>
                           <td style={{color:"var(--accent)",fontSize:12,fontWeight:700}}>{Number(e.appo)||0}</td>
@@ -470,9 +519,14 @@ function AdminView({members, projects, onSaveMembers, onSaveProjects}) {
   const [listInputs, setListInputs] = useState({});
   const [savedMsg, setSavedMsg] = useState("");
 
+  // Sync when props update
+  useEffect(()=>setLm(members),[members]);
+  useEffect(()=>setLp(projects),[projects]);
+
   const save = () => {
     onSaveMembers(lm); onSaveProjects(lp);
-    setSavedMsg("保存しました！"); setTimeout(()=>setSavedMsg(""),2000);
+    setSavedMsg("✅ 保存しました！次回以降もこの内容が引き継がれます。");
+    setTimeout(()=>setSavedMsg(""),3000);
   };
   const addM = () => { if (!newM.trim()) return; setLm(ms=>[...ms,{id:Date.now().toString(),name:newM.trim()}]); setNewM(""); };
   const addP = () => {
@@ -496,14 +550,17 @@ function AdminView({members, projects, onSaveMembers, onSaveProjects}) {
     <div>
       <div className="sec-header">
         <div className="sec-title">⚙️ マスタ管理</div>
-        <button className="btn btn-green" onClick={save}>保存する</button>
+        <button className="btn btn-green" onClick={save}>💾 保存する</button>
       </div>
       {savedMsg && <div className="success-msg">{savedMsg}</div>}
+      <div style={{background:"#fffbeb",border:"1px solid #fde68a",borderRadius:8,padding:"10px 14px",marginBottom:16,fontSize:13,color:"#92400e",fontWeight:600}}>
+        ⚠️ 変更後は必ず「保存する」ボタンを押してください。保存した内容はブラウザが変わらない限り永続されます。
+      </div>
 
       <div className="card" style={{marginBottom:16}}>
         <div className="card-title">メンバー管理</div>
         <div style={{display:"flex",gap:8,marginBottom:12}}>
-          <input className="form-input" style={{flex:1}} placeholder="新規メンバー名" value={newM}
+          <input className="form-input" style={{flex:1}} placeholder="新規メンバー名を入力" value={newM}
             onChange={e=>setNewM(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addM()}/>
           <button className="btn btn-primary" onClick={addM}>追加</button>
         </div>
@@ -513,7 +570,7 @@ function AdminView({members, projects, onSaveMembers, onSaveProjects}) {
             <tbody>
               {lm.map((m,i)=>(
                 <tr key={m.id}>
-                  <td><input className="form-input" value={m.name} style={{maxWidth:260}}
+                  <td><input className="form-input" value={m.name} style={{maxWidth:280}}
                     onChange={e=>setLm(ms=>ms.map((x,j)=>j===i?{...x,name:e.target.value}:x))}/></td>
                   <td><button className="btn btn-danger" onClick={()=>setLm(ms=>ms.filter((_,j)=>j!==i))}>削除</button></td>
                 </tr>
@@ -531,32 +588,32 @@ function AdminView({members, projects, onSaveMembers, onSaveProjects}) {
           <button className="btn btn-primary" onClick={addP}>追加</button>
         </div>
         {lp.map((p,pidx)=>(
-          <div key={p.id} style={{background:"var(--surface2)",border:"1px solid var(--border)",borderRadius:10,padding:14,marginBottom:10}}>
-            <div style={{display:"grid",gridTemplateColumns:"1fr auto auto",gap:8,marginBottom:10,alignItems:"center"}}>
+          <div key={p.id} style={{background:"var(--surface2)",border:"1.5px solid var(--border)",borderRadius:10,padding:16,marginBottom:12}}>
+            <div style={{display:"grid",gridTemplateColumns:"1fr auto auto",gap:8,marginBottom:12,alignItems:"center"}}>
               <input className="form-input" value={p.name}
                 onChange={e=>setLp(ps=>ps.map((x,j)=>j===pidx?{...x,name:e.target.value}:x))}/>
               <div style={{display:"flex",alignItems:"center",gap:6}}>
-                <span style={{fontSize:11,color:"var(--muted)",whiteSpace:"nowrap"}}>目標アポ</span>
+                <span style={{fontSize:11,color:"var(--muted)",whiteSpace:"nowrap",fontWeight:700}}>目標アポ</span>
                 <input className="form-input" type="number" style={{width:70}} value={p.targetAppo}
                   onChange={e=>setLp(ps=>ps.map((x,j)=>j===pidx?{...x,targetAppo:Number(e.target.value)}:x))}/>
               </div>
               <button className="btn btn-danger" onClick={()=>setLp(ps=>ps.filter((_,j)=>j!==pidx))}>削除</button>
             </div>
-            <div style={{fontSize:11,color:"var(--muted)",marginBottom:6}}>担当メンバー</div>
-            <div style={{marginBottom:12,display:"flex",flexWrap:"wrap",gap:4}}>
+            <div style={{fontSize:11,color:"var(--muted)",marginBottom:6,fontWeight:700}}>担当メンバー（クリックで選択）</div>
+            <div style={{marginBottom:14,display:"flex",flexWrap:"wrap",gap:4}}>
               {lm.map(m=>(
                 <span key={m.id} className={`member-tag ${p.memberIds?.includes(m.id)?"selected":""}`}
                   onClick={()=>toggleM(m.id,pidx)}>{m.name}</span>
               ))}
             </div>
-            <div style={{fontSize:11,color:"var(--muted)",marginBottom:8}}>リスト管理</div>
+            <div style={{fontSize:11,color:"var(--muted)",marginBottom:8,fontWeight:700}}>リスト管理</div>
             <div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:8}}>
               {(p.lists||[]).map((l,lidx)=>(
                 <span key={lidx} className="list-chip">{l}
                   <span className="list-chip-x" onClick={()=>removeList(pidx,lidx)}>×</span>
                 </span>
               ))}
-              {!(p.lists||[]).length && <span style={{fontSize:12,color:"var(--muted)"}}>リストなし</span>}
+              {!(p.lists||[]).length && <span style={{fontSize:12,color:"var(--muted)"}}>リストがまだ登録されていません</span>}
             </div>
             <div style={{display:"flex",gap:8}}>
               <input className="form-input" style={{flex:1}} placeholder="新規リスト名（例：リストA-3）"
@@ -572,6 +629,11 @@ function AdminView({members, projects, onSaveMembers, onSaveProjects}) {
   );
 }
 
+// CSS変数をJSから参照するためのヘルパー
+const var_green  = "#059669";
+const var_yellow = "#d97706";
+const var_accent = "#2563eb";
+
 // ===== ROOT =====
 function App() {
   const [tab, setTab] = useState("report");
@@ -581,16 +643,17 @@ function App() {
   const [loaded,   setLoaded]   = useState(false);
 
   useEffect(()=>{
-    setMembers(LS.get("is_members")||DEFAULT_MEMBERS);
-    setProjects(LS.get("is_projects")||DEFAULT_PROJECTS);
-    setReports(LS.get("is_reports")||[]);
+    // localStorageから読み込み（永続化）
+    setMembers(LS.get("is_members")  || DEFAULT_MEMBERS);
+    setProjects(LS.get("is_projects") || DEFAULT_PROJECTS);
+    setReports(LS.get("is_reports")  || []);
     setLoaded(true);
   },[]);
 
   const saveMembers  = useCallback(m=>{setMembers(m);  LS.set("is_members",m);},[]);
   const saveProjects = useCallback(p=>{setProjects(p); LS.set("is_projects",p);},[]);
-  const addReport    = useCallback(r=>{setReports(rs=>{const u=[...rs,r]; LS.set("is_reports",u); return u;});},[]);
-  const deleteReport = useCallback(id=>{setReports(rs=>{const u=rs.filter(r=>r.id!==id); LS.set("is_reports",u); return u;});},[]);
+  const addReport    = useCallback(r=>{setReports(rs=>{ const u=[...rs,r]; LS.set("is_reports",u); return u; });},[]);
+  const deleteReport = useCallback(id=>{setReports(rs=>{ const u=rs.filter(r=>r.id!==id); LS.set("is_reports",u); return u; });},[]);
 
   const tabs=[
     {key:"report",    label:"📋 日次報告"},
@@ -604,7 +667,7 @@ function App() {
   return (
     <div className="app">
       <nav className="nav">
-        <span className="nav-logo">IS·MGR</span>
+        <span className="nav-logo">IS日次報告</span>
         {tabs.map(t=>(
           <button key={t.key} className={`nav-tab ${tab===t.key?"active":""}`} onClick={()=>setTab(t.key)}>{t.label}</button>
         ))}
