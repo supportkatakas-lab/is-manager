@@ -90,9 +90,9 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:#f8faff;}
 const {useState, useEffect, useCallback, useRef} = React;
 
 // ===== GAS API URL =====
-const GAS_URL = "https://script.google.com/macros/s/AKfycbyfxvkjA3eeJTv00qy2rJb29giXxJEaZ9r5b14RP4JdZCrKyxlRCiy4HpHBhNxTRaM3/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbyYHrQyt_4SKHZD-QLxaqq7d77hkQ3QgbuqCrs8dKsZ1we56WTqa_4zb0hG6_S95DdN/exec";
 
-// ===== API HELPERS =====
+// ===== API HELPERS (GET only - CORSエラー回避) =====
 async function apiGet() {
   const res = await fetch(GAS_URL + "?action=getAll");
   const data = await res.json();
@@ -100,10 +100,15 @@ async function apiGet() {
   return data;
 }
 async function apiPost(body) {
-  const res = await fetch(GAS_URL, {
-    method: "POST",
-    body: JSON.stringify(body),
-  });
+  const { action, ...rest } = body;
+  let params = "?action=" + action;
+  if (rest.data !== undefined) {
+    params += "&data=" + encodeURIComponent(JSON.stringify(rest.data));
+  }
+  if (rest.id !== undefined) {
+    params += "&id=" + encodeURIComponent(rest.id);
+  }
+  const res = await fetch(GAS_URL + params);
   const data = await res.json();
   if (data.error) throw new Error(data.error);
   return data;
