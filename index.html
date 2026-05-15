@@ -11,23 +11,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --bg:#f5f7fa;
-  --surface:#ffffff;
-  --surface2:#f0f3f8;
-  --border:#dde3ed;
-  --accent:#2563eb;
-  --accent2:#0891b2;
-  --green:#059669;
-  --yellow:#d97706;
-  --red:#dc2626;
-  --text:#1e293b;
-  --muted:#64748b;
-  --radius:10px;
+  --bg:#f5f7fa;--surface:#ffffff;--surface2:#f0f3f8;--border:#dde3ed;
+  --accent:#2563eb;--accent2:#0891b2;--green:#059669;--yellow:#d97706;--red:#dc2626;
+  --text:#1e293b;--muted:#64748b;--radius:10px;
 }
 body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-serif;min-height:100vh;}
 .app{display:flex;flex-direction:column;min-height:100vh;}
 .nav{background:#fff;border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;gap:6px;min-height:56px;position:sticky;top:0;z-index:100;flex-wrap:wrap;box-shadow:0 1px 4px rgba(0,0,0,.06);}
-.nav-logo{font-family:'Noto Sans JP',sans-serif;font-size:15px;font-weight:700;color:var(--accent);margin-right:16px;white-space:nowrap;letter-spacing:.5px;}
+.nav-logo{font-size:15px;font-weight:700;color:var(--accent);margin-right:16px;white-space:nowrap;}
 .nav-tab{background:none;border:none;color:var(--muted);font-family:'Noto Sans JP',sans-serif;font-size:13px;font-weight:500;padding:6px 14px;border-radius:6px;cursor:pointer;transition:all .2s;white-space:nowrap;}
 .nav-tab:hover{background:var(--surface2);color:var(--text);}
 .nav-tab.active{background:var(--accent);color:#fff;}
@@ -41,49 +32,43 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-seri
 .stat{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px;}
 .stat-label{font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:600;}
 .stat-value{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:var(--text);}
-.stat-value.blue{color:var(--accent);}
-.stat-value.green{color:var(--green);}
-.stat-value.yellow{color:var(--yellow);}
-.stat-value.cyan{color:var(--accent2);}
+.stat-value.blue{color:var(--accent);}.stat-value.green{color:var(--green);}
+.stat-value.yellow{color:var(--yellow);}.stat-value.cyan{color:var(--accent2);}
 .progress-bar{height:5px;background:var(--border);border-radius:999px;overflow:hidden;margin-top:5px;}
 .progress-fill{height:100%;border-radius:999px;transition:width .5s;}
 .tbl-wrap{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:13px;}
 th{padding:9px 12px;text-align:left;color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;border-bottom:2px solid var(--border);white-space:nowrap;background:#fafbfc;}
 td{padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap;color:var(--text);}
-tr:last-child td{border-bottom:none;}
-tr:hover td{background:#f8faff;}
+tr:last-child td{border-bottom:none;}tr:hover td{background:#f8faff;}
 .form-label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;}
 .form-input,.form-select{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:7px;color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:14px;padding:8px 12px;outline:none;transition:border .2s;}
 .form-input:focus,.form-select:focus{border-color:var(--accent);}
 .form-input:disabled,.form-select:disabled{background:var(--surface2);color:var(--muted);cursor:not-allowed;}
 .call-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
 @media(min-width:480px){.call-grid{grid-template-columns:repeat(4,1fr);}}
-.call-field{background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:10px;transition:border .2s;}
-.call-field:focus-within{border-color:var(--accent);}
+.call-field{background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:10px;}
 .call-field label{display:block;font-size:10px;font-weight:700;margin-bottom:4px;color:var(--muted);}
 .call-field input{width:100%;background:transparent;border:none;color:var(--text);font-family:'Space Mono',monospace;font-size:20px;font-weight:700;outline:none;}
 .btn{border:none;border-radius:7px;font-family:'Noto Sans JP',sans-serif;font-size:14px;font-weight:700;padding:9px 18px;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px;}
-.btn-primary{background:var(--accent);color:#fff;}
-.btn-primary:hover{background:#1d4ed8;}
+.btn-primary{background:var(--accent);color:#fff;}.btn-primary:hover{background:#1d4ed8;}
 .btn-danger{background:transparent;border:1.5px solid var(--red);color:var(--red);font-size:12px;padding:5px 10px;}
 .btn-danger:hover{background:var(--red);color:#fff;}
 .btn-ghost{background:transparent;border:1.5px solid var(--border);color:var(--muted);font-size:13px;padding:7px 14px;}
 .btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
-.btn-green{background:var(--green);color:#fff;}
-.btn-green:hover{background:#047857;}
+.btn-green{background:var(--green);color:#fff;}.btn-green:hover{background:#047857;}
 .btn-export{background:#fff;border:1.5px solid var(--green);color:var(--green);font-size:13px;padding:7px 14px;font-weight:700;}
 .btn-export:hover{background:var(--green);color:#fff;}
 .badge{display:inline-block;border-radius:99px;font-size:11px;font-weight:700;padding:2px 9px;}
 .badge-blue{background:#eff6ff;color:var(--accent);}
 .badge-cyan{background:#ecfeff;color:var(--accent2);}
-.badge-green{background:#f0fdf4;color:var(--green);}
 .sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
 .sec-title{font-size:17px;font-weight:700;color:var(--text);}
 .success-msg{background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:8px;padding:14px;color:var(--green);font-weight:700;text-align:center;margin-bottom:16px;}
 .error-msg{background:#fef2f2;border:1.5px solid #fecaca;border-radius:8px;padding:12px;color:var(--red);margin-bottom:14px;font-size:13px;font-weight:600;}
+.warn-msg{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:13px;color:#92400e;font-weight:600;}
 .filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center;}
-.filter-row select{background:#fff;border:1.5px solid var(--border);color:var(--text);border-radius:7px;padding:7px 12px;font-size:13px;font-family:'Noto Sans JP',sans-serif;outline:none;transition:border .2s;}
+.filter-row select{background:#fff;border:1.5px solid var(--border);color:var(--text);border-radius:7px;padding:7px 12px;font-size:13px;font-family:'Noto Sans JP',sans-serif;outline:none;}
 .filter-row select:focus{border-color:var(--accent);}
 .empty{text-align:center;padding:32px;color:var(--muted);font-size:14px;}
 .member-tag{background:var(--surface2);border:1.5px solid var(--border);border-radius:5px;font-size:12px;padding:3px 10px;color:var(--muted);cursor:pointer;display:inline-block;margin:2px;transition:all .2s;font-weight:500;}
@@ -94,29 +79,45 @@ tr:hover td{background:#f8faff;}
 .list-chip{background:#ecfeff;border:1px solid #a5f3fc;border-radius:6px;padding:3px 10px;font-size:12px;color:var(--accent2);display:inline-flex;align-items:center;gap:6px;margin:2px;font-weight:600;}
 .list-chip-x{cursor:pointer;color:var(--red);font-weight:700;font-size:14px;}
 .expand-btn{background:none;border:none;color:var(--accent);cursor:pointer;font-size:12px;padding:2px 6px;font-weight:700;}
-.divider{height:1px;background:var(--border);margin:20px 0;}
+.loading{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--muted);gap:10px;font-size:14px;}
+.spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
 </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const {useState, useEffect, useCallback} = React;
+const {useState, useEffect, useCallback, useRef} = React;
 
-// ===== STORAGE: localStorage (persists across days/sessions) =====
-const LS = {
-  get: (k) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch { return null; } },
-  set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) { console.error(e); } },
-};
+// ===== GAS API URL =====
+const GAS_URL = "https://script.google.com/macros/s/AKfycbyfxvkjA3eeJTv00qy2rJb29giXxJEaZ9r5b14RP4JdZCrKyxlRCiy4HpHBhNxTRaM3/exec";
 
+// ===== API HELPERS =====
+async function apiGet() {
+  const res = await fetch(GAS_URL + "?action=getAll");
+  const data = await res.json();
+  if (data.error) throw new Error(data.error);
+  return data;
+}
+async function apiPost(body) {
+  const res = await fetch(GAS_URL, {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error);
+  return data;
+}
+
+// ===== DEFAULTS =====
 const DEFAULT_MEMBERS = [
   {id:"m1", name:"田中 花子"},
   {id:"m2", name:"佐藤 太郎"},
   {id:"m3", name:"鈴木 一郎"},
 ];
 const DEFAULT_PROJECTS = [
-  {id:"p1", name:"株式会社Aサービス", targetAppo:20, memberIds:["m1","m2"], lists:["リストA-1","リストA-2","リストA-3"]},
-  {id:"p2", name:"B社クラウド案件",   targetAppo:15, memberIds:["m2","m3"], lists:["リストB-1","リストB-2"]},
-  {id:"p3", name:"C社HR支援",         targetAppo:10, memberIds:["m1","m3"], lists:["リストC-1"]},
+  {id:"p1", name:"株式会社Aサービス", targetAppo:20, memberIds:["m1","m2"], lists:["リストA-1","リストA-2"]},
+  {id:"p2", name:"B社クラウド案件",   targetAppo:15, memberIds:["m2","m3"], lists:["リストB-1"]},
 ];
 
 const CALL_FIELDS = [
@@ -147,62 +148,60 @@ function calcStats(reports) {
   };
 }
 
-// ===== CSV EXPORT =====
 function exportToCSV(reports, members, projects) {
   const getM = id => members.find(m=>m.id===id)?.name||id;
   const getP = id => projects.find(p=>p.id===id)?.name||id;
   const rows = [["日付","名前","案件名","リスト名","架電数","アポ数","本人資料請求","不通","本人不在","本人拒否","受付拒否","受付資料請求","アポ率(%)","通電率(%)","CA率(%)"]];
   reports.sort((a,b)=>a.date?.localeCompare(b.date)).forEach(r => {
-    (r.entries||[]).forEach(e => {
+    const entries = Array.isArray(r.entries) ? r.entries : [];
+    entries.forEach(e => {
       const s = calcStats([{entries:[e]}]);
-      rows.push([r.date, getM(r.memberId), getP(r.projectId), e.listName,
-        Number(e.calls)||0, Number(e.appo)||0, Number(e.materialSelf)||0,
-        Number(e.noAnswer)||0, Number(e.absent)||0, Number(e.rejectedSelf)||0,
-        Number(e.rejectedReception)||0, Number(e.materialReception)||0,
-        s.appoRate, s.connectRate, s.caRate]);
+      rows.push([r.date,getM(r.memberId),getP(r.projectId),e.listName,
+        Number(e.calls)||0,Number(e.appo)||0,Number(e.materialSelf)||0,
+        Number(e.noAnswer)||0,Number(e.absent)||0,Number(e.rejectedSelf)||0,
+        Number(e.rejectedReception)||0,Number(e.materialReception)||0,
+        s.appoRate,s.connectRate,s.caRate]);
     });
   });
   const bom = "\uFEFF";
   const csv = bom + rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
-  const blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
+  const blob = new Blob([csv],{type:"text/csv;charset=utf-8;"});
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
-  a.href = url; a.download = `IS報告_${new Date().toISOString().slice(0,10)}.csv`;
+  a.href=url; a.download=`IS報告_${new Date().toISOString().slice(0,10)}.csv`;
   a.click(); URL.revokeObjectURL(url);
 }
 
-// ===== DASHBOARD =====
-function DashboardView({members, projects, reports}) {
-  const [fp, setFp] = useState("all");
-  const [fm, setFm] = useState("all");
-  const [fmo, setFmo] = useState("all");
+const C_GREEN="#059669", C_YELLOW="#d97706", C_ACCENT="#2563eb";
 
-  const months = [...new Set(reports.map(r=>r.date?.slice(0,7)))].sort().reverse();
-  const filtered = reports.filter(r => {
-    if (fp!=="all" && r.projectId!==fp) return false;
-    if (fm!=="all" && r.memberId!==fm) return false;
-    if (fmo!=="all" && !r.date?.startsWith(fmo)) return false;
+// ===== DASHBOARD =====
+function DashboardView({members, projects, reports, loading}) {
+  const [fp,setFp]=useState("all"), [fm,setFm]=useState("all"), [fmo,setFmo]=useState("all");
+  const months=[...new Set(reports.map(r=>r.date?.slice(0,7)))].sort().reverse();
+  const filtered=reports.filter(r=>{
+    if(fp!=="all"&&r.projectId!==fp)return false;
+    if(fm!=="all"&&r.memberId!==fm)return false;
+    if(fmo!=="all"&&!r.date?.startsWith(fmo))return false;
     return true;
   });
-  const overall = calcStats(filtered);
-  const getP = id => projects.find(p=>p.id===id)?.name||id;
-
-  const listMap = {};
-  filtered.forEach(r => {
-    (r.entries||[]).forEach(e => {
-      const k = r.projectId+"|||"+e.listName;
-      if (!listMap[k]) listMap[k] = {projectId:r.projectId, listName:e.listName, rows:[]};
+  const overall=calcStats(filtered);
+  const getP=id=>projects.find(p=>p.id===id)?.name||id;
+  const listMap={};
+  filtered.forEach(r=>{
+    (r.entries||[]).forEach(e=>{
+      const k=r.projectId+"|||"+e.listName;
+      if(!listMap[k])listMap[k]={projectId:r.projectId,listName:e.listName,rows:[]};
       listMap[k].rows.push(e);
     });
   });
+
+  if(loading) return <div className="loading"><div className="spinner"/>データを読み込み中...</div>;
 
   return (
     <div>
       <div className="sec-header">
         <div className="sec-title">📊 ダッシュボード</div>
-        <button className="btn btn-export" onClick={()=>exportToCSV(filtered, members, projects)}>
-          ⬇️ CSVエクスポート
-        </button>
+        <button className="btn btn-export" onClick={()=>exportToCSV(filtered,members,projects)}>⬇️ CSVエクスポート</button>
       </div>
       <div className="filter-row">
         <select value={fp} onChange={e=>setFp(e.target.value)}>
@@ -223,14 +222,14 @@ function DashboardView({members, projects, reports}) {
         <div className="card-title">全体サマリー（{filtered.length}件の報告）</div>
         <div className="grid4">
           {[
-            {label:"架電数",       val:overall.calls.toLocaleString(), cls:""},
-            {label:"アポ数",       val:overall.appo,                   cls:"blue"},
-            {label:"アポ率",       val:overall.appoRate+"%",           cls:"green"},
-            {label:"通電率",       val:overall.connectRate+"%",        cls:"yellow"},
-            {label:"CA率",         val:overall.caRate+"%",             cls:"cyan"},
-            {label:"本人資料請求", val:overall.materialSelf,           cls:""},
-            {label:"受付資料請求", val:overall.materialReception,      cls:""},
-            {label:"不通",         val:overall.noAnswer,               cls:""},
+            {label:"架電数",val:overall.calls.toLocaleString(),cls:""},
+            {label:"アポ数",val:overall.appo,cls:"blue"},
+            {label:"アポ率",val:overall.appoRate+"%",cls:"green"},
+            {label:"通電率",val:overall.connectRate+"%",cls:"yellow"},
+            {label:"CA率",val:overall.caRate+"%",cls:"cyan"},
+            {label:"本人資料請求",val:overall.materialSelf,cls:""},
+            {label:"受付資料請求",val:overall.materialReception,cls:""},
+            {label:"不通",val:overall.noAnswer,cls:""},
           ].map(s=>(
             <div className="stat" key={s.label}>
               <div className="stat-label">{s.label}</div>
@@ -247,10 +246,10 @@ function DashboardView({members, projects, reports}) {
             <thead><tr><th>案件名</th><th>目標</th><th>アポ</th><th>進捗率</th><th>架電</th><th>アポ率</th><th>通電率</th><th>CA率</th></tr></thead>
             <tbody>
               {projects.map(p=>{
-                const s = calcStats(filtered.filter(r=>r.projectId===p.id));
-                const pct = p.targetAppo>0 ? Math.min(100,s.appo/p.targetAppo*100).toFixed(0) : 0;
-                const col = pct>=80?var_green:pct>=50?var_yellow:var_accent;
-                return (
+                const s=calcStats(filtered.filter(r=>r.projectId===p.id));
+                const pct=p.targetAppo>0?Math.min(100,s.appo/p.targetAppo*100).toFixed(0):0;
+                const col=pct>=80?C_GREEN:pct>=50?C_YELLOW:C_ACCENT;
+                return(
                   <tr key={p.id}>
                     <td style={{fontWeight:700}}>{p.name}</td>
                     <td>{p.targetAppo}</td>
@@ -266,7 +265,7 @@ function DashboardView({members, projects, reports}) {
         </div>
       </div>
 
-      {Object.keys(listMap).length>0 && (
+      {Object.keys(listMap).length>0&&(
         <div className="card" style={{marginBottom:16}}>
           <div className="card-title">リスト別詳細</div>
           <div className="tbl-wrap">
@@ -274,13 +273,12 @@ function DashboardView({members, projects, reports}) {
               <thead><tr><th>案件</th><th>リスト名</th><th>架電</th><th>アポ</th><th>本人資料</th><th>不通</th><th>不在</th><th>本人拒否</th><th>受付拒否</th><th>受付資料</th><th>アポ率</th><th>通電率</th></tr></thead>
               <tbody>
                 {Object.values(listMap).map((ls,i)=>{
-                  const s = calcStats([{entries:ls.rows}]);
-                  return (
+                  const s=calcStats([{entries:ls.rows}]);
+                  return(
                     <tr key={i}>
                       <td><span className="badge badge-blue">{getP(ls.projectId)}</span></td>
                       <td style={{color:"var(--accent2)",fontWeight:700}}>{ls.listName}</td>
-                      <td>{s.calls}</td>
-                      <td style={{color:"var(--accent)",fontWeight:700}}>{s.appo}</td>
+                      <td>{s.calls}</td><td style={{color:"var(--accent)",fontWeight:700}}>{s.appo}</td>
                       <td>{s.materialSelf}</td>
                       <td style={{color:"var(--muted)"}}>{s.noAnswer}</td>
                       <td style={{color:"var(--muted)"}}>{s.absent}</td>
@@ -304,10 +302,10 @@ function DashboardView({members, projects, reports}) {
             <thead><tr><th>名前</th><th>報告数</th><th>架電</th><th>アポ</th><th>アポ率</th><th>通電率</th><th>CA率</th></tr></thead>
             <tbody>
               {members.map(m=>{
-                const mr = filtered.filter(r=>r.memberId===m.id);
-                if (!mr.length) return null;
-                const s = calcStats(mr);
-                return (
+                const mr=filtered.filter(r=>r.memberId===m.id);
+                if(!mr.length)return null;
+                const s=calcStats(mr);
+                return(
                   <tr key={m.id}>
                     <td style={{fontWeight:700}}>{m.name}</td>
                     <td><span className="badge badge-blue">{mr.length}日</span></td>
@@ -329,46 +327,52 @@ function DashboardView({members, projects, reports}) {
 }
 
 // ===== REPORT FORM =====
-function ReportFormView({members, projects, onSubmit}) {
-  const today = new Date().toISOString().slice(0,10);
-  const [date, setDate] = useState(today);
-  const [memberId, setMemberId] = useState("");
-  const [projectId, setProjectId] = useState("");
-  const [entries, setEntries] = useState([EMPTY_ENTRY()]);
-  const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState("");
+function ReportFormView({members, projects, onSubmit, loading}) {
+  const today=new Date().toISOString().slice(0,10);
+  const [date,setDate]=useState(today);
+  const [memberId,setMemberId]=useState("");
+  const [projectId,setProjectId]=useState("");
+  const [entries,setEntries]=useState([EMPTY_ENTRY()]);
+  const [submitted,setSubmitted]=useState(false);
+  const [error,setError]=useState("");
+  const [sending,setSending]=useState(false);
 
-  const memberProjects = memberId ? projects.filter(p=>p.memberIds?.includes(memberId)) : [];
-  const currentProject = projects.find(p=>p.id===projectId);
-  const listOptions = currentProject?.lists||[];
+  const memberProjects=memberId?projects.filter(p=>p.memberIds?.includes(memberId)):[];
+  const currentProject=projects.find(p=>p.id===projectId);
+  const listOptions=currentProject?.lists||[];
 
-  const setEntry = (i,k,v) => setEntries(es=>es.map((e,j)=>j===i?{...e,[k]:v}:e));
-  const addEntry = () => setEntries(es=>[...es, EMPTY_ENTRY()]);
-  const removeEntry = i => setEntries(es=>es.filter((_,j)=>j!==i));
+  const setEntry=(i,k,v)=>setEntries(es=>es.map((e,j)=>j===i?{...e,[k]:v}:e));
+  const addEntry=()=>setEntries(es=>[...es,EMPTY_ENTRY()]);
+  const removeEntry=i=>setEntries(es=>es.filter((_,j)=>j!==i));
+  const reset=()=>{setMemberId("");setProjectId("");setDate(today);setEntries([EMPTY_ENTRY()]);setSubmitted(false);setError("");};
 
-  const reset = () => { setMemberId(""); setProjectId(""); setDate(today); setEntries([EMPTY_ENTRY()]); setSubmitted(false); setError(""); };
-
-  const handleSubmit = () => {
-    if (!memberId)  { setError("名前を選択してください"); return; }
-    if (!projectId) { setError("案件を選択してください"); return; }
-    if (entries.some(e=>!e.listName)) { setError("すべてのリスト名を入力してください"); return; }
-    if (entries.some(e=>!e.calls))    { setError("架電数を入力してください"); return; }
-    setError("");
-    onSubmit({id:Date.now().toString(), createdAt:new Date().toISOString(), date, memberId, projectId, entries});
-    setSubmitted(true);
+  const handleSubmit=async()=>{
+    if(!memberId){setError("名前を選択してください");return;}
+    if(!projectId){setError("案件を選択してください");return;}
+    if(entries.some(e=>!e.listName)){setError("すべてのリスト名を入力してください");return;}
+    if(entries.some(e=>!e.calls)){setError("架電数を入力してください");return;}
+    setError(""); setSending(true);
+    try {
+      await onSubmit({id:Date.now().toString(),createdAt:new Date().toISOString(),date,memberId,projectId,entries});
+      setSubmitted(true);
+    } catch(e) {
+      setError("送信に失敗しました。もう一度お試しください。");
+    } finally { setSending(false); }
   };
 
-  if (submitted) return (
+  if(loading) return <div className="loading"><div className="spinner"/>データを読み込み中...</div>;
+
+  if(submitted) return(
     <div style={{maxWidth:600,margin:"0 auto"}}>
       <div className="success-msg">✅ 報告を送信しました！お疲れ様でした。</div>
       <div style={{textAlign:"center"}}><button className="btn btn-primary" onClick={reset}>続けて報告する</button></div>
     </div>
   );
 
-  return (
+  return(
     <div style={{maxWidth:660,margin:"0 auto"}}>
       <div className="sec-title" style={{marginBottom:16}}>📋 日次報告入力</div>
-      {error && <div className="error-msg">⚠️ {error}</div>}
+      {error&&<div className="error-msg">⚠️ {error}</div>}
       <div className="card">
         <div className="grid2" style={{gap:12,marginBottom:14}}>
           <div><label className="form-label">日付</label>
@@ -379,9 +383,8 @@ function ReportFormView({members, projects, onSubmit}) {
               {members.map(m=><option key={m.id} value={m.id}>{m.name}</option>)}
             </select></div>
         </div>
-        <div><label className="form-label">
-          案件
-          {!memberId && <span style={{color:"var(--muted)",fontWeight:400,fontSize:11}}> ← 先に名前を選んでください</span>}
+        <div><label className="form-label">案件
+          {!memberId&&<span style={{color:"var(--muted)",fontWeight:400,fontSize:11}}> ← 先に名前を選んでください</span>}
         </label>
           <select className="form-select" value={projectId} onChange={e=>setProjectId(e.target.value)} disabled={!memberId}>
             <option value="">選択してください</option>
@@ -394,26 +397,26 @@ function ReportFormView({members, projects, onSubmit}) {
         <div className="list-entry" key={i} style={{marginTop:12}}>
           <div className="list-entry-header">
             <span className="list-entry-title">📁 リスト {i+1}</span>
-            {entries.length>1 && <button className="btn btn-danger" onClick={()=>removeEntry(i)}>削除</button>}
+            {entries.length>1&&<button className="btn btn-danger" onClick={()=>removeEntry(i)}>削除</button>}
           </div>
           <div style={{marginBottom:12}}>
             <label className="form-label">リスト名</label>
             {listOptions.length>0
-              ? <select className="form-select" value={entry.listName} onChange={e=>setEntry(i,"listName",e.target.value)}>
-                  <option value="">選択してください</option>
-                  {listOptions.map(l=><option key={l} value={l}>{l}</option>)}
-                </select>
-              : <input className="form-input" placeholder="案件を先に選んでください" value={entry.listName}
-                  onChange={e=>setEntry(i,"listName",e.target.value)} disabled={!projectId}/>
+              ?<select className="form-select" value={entry.listName} onChange={e=>setEntry(i,"listName",e.target.value)}>
+                <option value="">選択してください</option>
+                {listOptions.map(l=><option key={l} value={l}>{l}</option>)}
+              </select>
+              :<input className="form-input" placeholder="案件を先に選んでください" value={entry.listName}
+                onChange={e=>setEntry(i,"listName",e.target.value)} disabled={!projectId}/>
             }
           </div>
           <div className="call-grid">
             {CALL_FIELDS.map(f=>(
               <div className="call-field" key={f.key}>
-                <label style={{color:f.color!=="var(--text)"&&f.color!=="var(--muted)"?f.color:"var(--muted)"}}>{f.label}</label>
+                <label style={{color:["var(--text)","var(--muted)"].includes(f.color)?"var(--muted)":f.color}}>{f.label}</label>
                 <input type="number" min="0" placeholder="0" value={entry[f.key]}
                   onChange={e=>setEntry(i,f.key,e.target.value)}
-                  style={{color:f.color!=="var(--text)"&&f.color!=="var(--muted)"?f.color:"var(--text)"}}/>
+                  style={{color:["var(--text)","var(--muted)"].includes(f.color)?"var(--text)":f.color}}/>
               </div>
             ))}
           </div>
@@ -422,33 +425,34 @@ function ReportFormView({members, projects, onSubmit}) {
 
       <div style={{display:"flex",gap:10,marginTop:14,justifyContent:"space-between"}}>
         <button className="btn btn-ghost" onClick={addEntry}>＋ リストを追加</button>
-        <button className="btn btn-primary" onClick={handleSubmit} style={{minWidth:130}}>送信する →</button>
+        <button className="btn btn-primary" onClick={handleSubmit} disabled={sending} style={{minWidth:130}}>
+          {sending?<><div className="spinner" style={{width:16,height:16,borderWidth:2}}/>送信中...</>:"送信する →"}
+        </button>
       </div>
     </div>
   );
 }
 
 // ===== REPORTS LIST =====
-function ReportsView({members, projects, reports, onDelete}) {
-  const [fp, setFp] = useState("all");
-  const [fm, setFm] = useState("all");
-  const [expandedId, setExpandedId] = useState(null);
-  const getM = id => members.find(m=>m.id===id)?.name||id;
-  const getP = id => projects.find(p=>p.id===id)?.name||id;
-
-  const filtered = reports.filter(r=>{
-    if (fp!=="all" && r.projectId!==fp) return false;
-    if (fm!=="all" && r.memberId!==fm) return false;
+function ReportsView({members, projects, reports, onDelete, loading}) {
+  const [fp,setFp]=useState("all"),[fm,setFm]=useState("all"),[expandedId,setExpandedId]=useState(null);
+  const getM=id=>members.find(m=>m.id===id)?.name||id;
+  const getP=id=>projects.find(p=>p.id===id)?.name||id;
+  const filtered=reports.filter(r=>{
+    if(fp!=="all"&&r.projectId!==fp)return false;
+    if(fm!=="all"&&r.memberId!==fm)return false;
     return true;
   }).sort((a,b)=>b.date?.localeCompare(a.date));
 
-  return (
+  if(loading) return <div className="loading"><div className="spinner"/>データを読み込み中...</div>;
+
+  return(
     <div>
       <div className="sec-header">
         <div className="sec-title">🗂 報告一覧</div>
         <div style={{display:"flex",gap:8,alignItems:"center"}}>
           <span className="badge badge-blue">{filtered.length}件</span>
-          <button className="btn btn-export" onClick={()=>exportToCSV(filtered, members, projects)}>⬇️ CSVエクスポート</button>
+          <button className="btn btn-export" onClick={()=>exportToCSV(filtered,members,projects)}>⬇️ CSVエクスポート</button>
         </div>
       </div>
       <div className="filter-row">
@@ -466,11 +470,11 @@ function ReportsView({members, projects, reports, onDelete}) {
           <table>
             <thead><tr><th></th><th>日付</th><th>名前</th><th>案件</th><th>リスト数</th><th>架電</th><th>アポ</th><th>アポ率</th><th>通電率</th><th></th></tr></thead>
             <tbody>
-              {filtered.length===0 && <tr><td colSpan={10} className="empty">報告がありません</td></tr>}
+              {filtered.length===0&&<tr><td colSpan={10} className="empty">報告がありません</td></tr>}
               {filtered.map(r=>{
-                const s = calcStats([r]);
-                const isExp = expandedId===r.id;
-                return (
+                const s=calcStats([r]);
+                const isExp=expandedId===r.id;
+                return(
                   <React.Fragment key={r.id}>
                     <tr>
                       <td><button className="expand-btn" onClick={()=>setExpandedId(isExp?null:r.id)}>{isExp?"▲":"▼"}</button></td>
@@ -480,22 +484,21 @@ function ReportsView({members, projects, reports, onDelete}) {
                       <td><span className="badge badge-cyan">{(r.entries||[]).length}リスト</span></td>
                       <td>{s.calls}</td>
                       <td style={{color:"var(--accent)",fontWeight:700}}>{s.appo}</td>
-                      <td>{s.appoRate}%</td>
-                      <td>{s.connectRate}%</td>
+                      <td>{s.appoRate}%</td><td>{s.connectRate}%</td>
                       <td><button className="btn btn-danger" onClick={()=>onDelete(r.id)}>削除</button></td>
                     </tr>
-                    {isExp && (r.entries||[]).map((e,i)=>{
-                      const es = calcStats([{entries:[e]}]);
-                      return (
+                    {isExp&&(r.entries||[]).map((e,i)=>{
+                      const es=calcStats([{entries:[e]}]);
+                      return(
                         <tr key={i} style={{background:"#f8faff"}}>
-                          <td></td><td></td><td></td>
+                          <td/><td/><td/>
                           <td style={{color:"var(--accent2)",fontSize:12,fontWeight:600}}>└ {e.listName}</td>
-                          <td></td>
+                          <td/>
                           <td style={{fontSize:12}}>{Number(e.calls)||0}</td>
                           <td style={{color:"var(--accent)",fontSize:12,fontWeight:700}}>{Number(e.appo)||0}</td>
                           <td style={{fontSize:12}}>{es.appoRate}%</td>
                           <td style={{fontSize:12}}>{es.connectRate}%</td>
-                          <td></td>
+                          <td/>
                         </tr>
                       );
                     })}
@@ -511,51 +514,62 @@ function ReportsView({members, projects, reports, onDelete}) {
 }
 
 // ===== ADMIN =====
-function AdminView({members, projects, onSaveMembers, onSaveProjects}) {
-  const [lm, setLm] = useState(members);
-  const [lp, setLp] = useState(projects);
-  const [newM, setNewM] = useState("");
-  const [newP, setNewP] = useState({name:"",targetAppo:"",memberIds:[],lists:[]});
-  const [listInputs, setListInputs] = useState({});
-  const [savedMsg, setSavedMsg] = useState("");
+function AdminView({members, projects, onSaveMembers, onSaveProjects, loading}) {
+  const [lm,setLm]=useState(members);
+  const [lp,setLp]=useState(projects);
+  const [newM,setNewM]=useState("");
+  const [newP,setNewP]=useState({name:"",targetAppo:"",memberIds:[],lists:[]});
+  const [listInputs,setListInputs]=useState({});
+  const [savedMsg,setSavedMsg]=useState("");
+  const [saving,setSaving]=useState(false);
+  const [error,setError]=useState("");
 
-  // Sync when props update
   useEffect(()=>setLm(members),[members]);
   useEffect(()=>setLp(projects),[projects]);
 
-  const save = () => {
-    onSaveMembers(lm); onSaveProjects(lp);
-    setSavedMsg("✅ 保存しました！次回以降もこの内容が引き継がれます。");
-    setTimeout(()=>setSavedMsg(""),3000);
+  const save=async()=>{
+    setSaving(true); setError("");
+    try {
+      await onSaveMembers(lm);
+      await onSaveProjects(lp);
+      setSavedMsg("✅ 保存しました！PC・スマホ両方に反映されます。");
+      setTimeout(()=>setSavedMsg(""),4000);
+    } catch(e) {
+      setError("保存に失敗しました。もう一度お試しください。");
+    } finally { setSaving(false); }
   };
-  const addM = () => { if (!newM.trim()) return; setLm(ms=>[...ms,{id:Date.now().toString(),name:newM.trim()}]); setNewM(""); };
-  const addP = () => {
-    if (!newP.name.trim()) return;
+
+  const addM=()=>{if(!newM.trim())return;setLm(ms=>[...ms,{id:Date.now().toString(),name:newM.trim()}]);setNewM("");};
+  const addP=()=>{
+    if(!newP.name.trim())return;
     setLp(ps=>[...ps,{...newP,id:Date.now().toString(),targetAppo:Number(newP.targetAppo)||0}]);
     setNewP({name:"",targetAppo:"",memberIds:[],lists:[]});
   };
-  const toggleM = (mId, pidx) => setLp(ps=>ps.map((p,i)=>{
-    if (i!==pidx) return p;
-    const ids = p.memberIds?.includes(mId)?p.memberIds.filter(x=>x!==mId):[...(p.memberIds||[]),mId];
-    return {...p,memberIds:ids};
+  const toggleM=(mId,pidx)=>setLp(ps=>ps.map((p,i)=>{
+    if(i!==pidx)return p;
+    const ids=p.memberIds?.includes(mId)?p.memberIds.filter(x=>x!==mId):[...(p.memberIds||[]),mId];
+    return{...p,memberIds:ids};
   }));
-  const addList = (pidx) => {
-    const v = (listInputs[pidx]||"").trim(); if (!v) return;
+  const addList=(pidx)=>{
+    const v=(listInputs[pidx]||"").trim();if(!v)return;
     setLp(ps=>ps.map((p,i)=>i===pidx?{...p,lists:[...(p.lists||[]),v]}:p));
     setListInputs(s=>({...s,[pidx]:""}));
   };
-  const removeList = (pidx,lidx) => setLp(ps=>ps.map((p,i)=>i===pidx?{...p,lists:p.lists.filter((_,j)=>j!==lidx)}:p));
+  const removeList=(pidx,lidx)=>setLp(ps=>ps.map((p,i)=>i===pidx?{...p,lists:p.lists.filter((_,j)=>j!==lidx)}:p));
 
-  return (
+  if(loading) return <div className="loading"><div className="spinner"/>データを読み込み中...</div>;
+
+  return(
     <div>
       <div className="sec-header">
         <div className="sec-title">⚙️ マスタ管理</div>
-        <button className="btn btn-green" onClick={save}>💾 保存する</button>
+        <button className="btn btn-green" onClick={save} disabled={saving}>
+          {saving?<><div className="spinner" style={{width:16,height:16,borderWidth:2,borderTopColor:"#fff"}}/>保存中...</>:"💾 保存する"}
+        </button>
       </div>
-      {savedMsg && <div className="success-msg">{savedMsg}</div>}
-      <div style={{background:"#fffbeb",border:"1px solid #fde68a",borderRadius:8,padding:"10px 14px",marginBottom:16,fontSize:13,color:"#92400e",fontWeight:600}}>
-        ⚠️ 変更後は必ず「保存する」ボタンを押してください。保存した内容はブラウザが変わらない限り永続されます。
-      </div>
+      {savedMsg&&<div className="success-msg">{savedMsg}</div>}
+      {error&&<div className="error-msg">⚠️ {error}</div>}
+      <div className="warn-msg">⚠️ 変更後は必ず「保存する」を押してください。Googleスプレッドシートに保存され、PC・スマホ共通で反映されます。</div>
 
       <div className="card" style={{marginBottom:16}}>
         <div className="card-title">メンバー管理</div>
@@ -613,7 +627,7 @@ function AdminView({members, projects, onSaveMembers, onSaveProjects}) {
                   <span className="list-chip-x" onClick={()=>removeList(pidx,lidx)}>×</span>
                 </span>
               ))}
-              {!(p.lists||[]).length && <span style={{fontSize:12,color:"var(--muted)"}}>リストがまだ登録されていません</span>}
+              {!(p.lists||[]).length&&<span style={{fontSize:12,color:"var(--muted)"}}>リストがまだ登録されていません</span>}
             </div>
             <div style={{display:"flex",gap:8}}>
               <input className="form-input" style={{flex:1}} placeholder="新規リスト名（例：リストA-3）"
@@ -629,31 +643,50 @@ function AdminView({members, projects, onSaveMembers, onSaveProjects}) {
   );
 }
 
-// CSS変数をJSから参照するためのヘルパー
-const var_green  = "#059669";
-const var_yellow = "#d97706";
-const var_accent = "#2563eb";
-
 // ===== ROOT =====
 function App() {
-  const [tab, setTab] = useState("report");
-  const [members,  setMembers]  = useState([]);
-  const [projects, setProjects] = useState([]);
-  const [reports,  setReports]  = useState([]);
-  const [loaded,   setLoaded]   = useState(false);
+  const [tab,setTab]=useState("report");
+  const [members,setMembers]=useState([]);
+  const [projects,setProjects]=useState([]);
+  const [reports,setReports]=useState([]);
+  const [loading,setLoading]=useState(true);
+  const [initError,setInitError]=useState("");
 
+  // 起動時にスプレッドシートから全データ読み込み
   useEffect(()=>{
-    // localStorageから読み込み（永続化）
-    setMembers(LS.get("is_members")  || DEFAULT_MEMBERS);
-    setProjects(LS.get("is_projects") || DEFAULT_PROJECTS);
-    setReports(LS.get("is_reports")  || []);
-    setLoaded(true);
+    (async()=>{
+      try {
+        const data = await apiGet();
+        setMembers(data.members?.length ? data.members : DEFAULT_MEMBERS);
+        setProjects(data.projects?.length ? data.projects : DEFAULT_PROJECTS);
+        setReports(data.reports||[]);
+      } catch(e) {
+        setInitError("スプレッドシートへの接続に失敗しました。GASのURLを確認してください。");
+        setMembers(DEFAULT_MEMBERS);
+        setProjects(DEFAULT_PROJECTS);
+      } finally { setLoading(false); }
+    })();
   },[]);
 
-  const saveMembers  = useCallback(m=>{setMembers(m);  LS.set("is_members",m);},[]);
-  const saveProjects = useCallback(p=>{setProjects(p); LS.set("is_projects",p);},[]);
-  const addReport    = useCallback(r=>{setReports(rs=>{ const u=[...rs,r]; LS.set("is_reports",u); return u; });},[]);
-  const deleteReport = useCallback(id=>{setReports(rs=>{ const u=rs.filter(r=>r.id!==id); LS.set("is_reports",u); return u; });},[]);
+  const saveMembers=useCallback(async m=>{
+    setMembers(m);
+    await apiPost({action:"saveMembers",data:m});
+  },[]);
+
+  const saveProjects=useCallback(async p=>{
+    setProjects(p);
+    await apiPost({action:"saveProjects",data:p});
+  },[]);
+
+  const addReport=useCallback(async r=>{
+    setReports(rs=>[...rs,r]);
+    await apiPost({action:"addReport",data:r});
+  },[]);
+
+  const deleteReport=useCallback(async id=>{
+    setReports(rs=>rs.filter(r=>r.id!==id));
+    await apiPost({action:"deleteReport",id});
+  },[]);
 
   const tabs=[
     {key:"report",    label:"📋 日次報告"},
@@ -662,9 +695,7 @@ function App() {
     {key:"admin",     label:"⚙️ マスタ管理"},
   ];
 
-  if (!loaded) return <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:"var(--bg)",color:"var(--muted)"}}>読み込み中...</div>;
-
-  return (
+  return(
     <div className="app">
       <nav className="nav">
         <span className="nav-logo">IS日次報告</span>
@@ -673,10 +704,11 @@ function App() {
         ))}
       </nav>
       <main className="main">
-        {tab==="dashboard" && <DashboardView members={members} projects={projects} reports={reports}/>}
-        {tab==="report"    && <ReportFormView members={members} projects={projects} onSubmit={addReport}/>}
-        {tab==="reports"   && <ReportsView    members={members} projects={projects} reports={reports} onDelete={deleteReport}/>}
-        {tab==="admin"     && <AdminView       members={members} projects={projects} onSaveMembers={saveMembers} onSaveProjects={saveProjects}/>}
+        {initError&&<div className="error-msg" style={{marginBottom:16}}>⚠️ {initError}</div>}
+        {tab==="dashboard"&&<DashboardView members={members} projects={projects} reports={reports} loading={loading}/>}
+        {tab==="report"   &&<ReportFormView members={members} projects={projects} onSubmit={addReport} loading={loading}/>}
+        {tab==="reports"  &&<ReportsView    members={members} projects={projects} reports={reports} onDelete={deleteReport} loading={loading}/>}
+        {tab==="admin"    &&<AdminView       members={members} projects={projects} onSaveMembers={saveMembers} onSaveProjects={saveProjects} loading={loading}/>}
       </main>
     </div>
   );
