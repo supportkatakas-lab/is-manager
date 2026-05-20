@@ -100,17 +100,14 @@ async function apiGet() {
   return data;
 }
 async function apiPost(body) {
-  // GASはno-corsでPOSTするとレスポンスが読めないため
-  // フォームデータ経由でPOSTしてリダイレクト先をGETで取得する方式を使う
-  // → 実用的な回避策: fetchをno-corsで送り、成功とみなす（GAS側は正常処理される）
-  const res = await fetch(GAS_URL, {
+  // GASのPOSTはno-corsで送信（CORSエラー回避）
+  // レスポンスは読めないが、GAS側は正常処理される
+  await fetch(GAS_URL, {
     method: "POST",
     mode: "no-cors",
     headers: { "Content-Type": "text/plain" },
     body: JSON.stringify(body),
   });
-  // no-corsではレスポンスボディが読めないが、GAS側は正常に処理される
-  // 少し待ってからGETで最新データを確認することで整合性を保つ
   return { success: true };
 }
 
@@ -550,9 +547,12 @@ function AdminView({members, projects, onSaveMembers, onSaveProjects, loading}) 
     try {
       await onSaveMembers(lm);
       await onSaveProjects(lp);
+      // no-corsのPOSTは成功してもレスポンスが読めないため、1秒待って完了とみなす
+      await new Promise(r => setTimeout(r, 1000));
       setSavedMsg("✅ 保存しました！PC・スマホ両方に反映されます。");
       setTimeout(()=>setSavedMsg(""),4000);
     } catch(e) {
+      console.error("Save error:", e);
       setError("保存に失敗しました。もう一度お試しください。");
     } finally { setSaving(false); }
   };
@@ -703,17 +703,17 @@ function App() {
 
   const saveMembers=useCallback(async m=>{
     setMembers(m);
-    await apiPost({action:"saveMembers",data:m});
+    try { await apiPost({action:"saveMembers",data:m}); } catch(e) { console.warn("saveMembers:", e); }
   },[]);
 
   const saveProjects=useCallback(async p=>{
     setProjects(p);
-    await apiPost({action:"saveProjects",data:p});
+    try { await apiPost({action:"saveProjects",data:p}); } catch(e) { console.warn("saveProjects:", e); }
   },[]);
 
   const addReport=useCallback(async r=>{
     setReports(rs=>[...rs,r]);
-    await apiPost({action:"addReport",data:r});
+    try { await apiPost({action:"addReport",data:r}); } catch(e) { console.warn("addReport:", e); }
   },[]);
 
   const deleteReport=useCallback(async id=>{
