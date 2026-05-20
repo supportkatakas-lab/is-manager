@@ -563,10 +563,16 @@ function AdminView({members, projects, onSaveMembers, onSaveProjects, loading}) 
     } finally { setSaving(false); }
   };
 
-  const addM=()=>{if(!newM.trim())return;setLm(ms=>[...ms,{id:Date.now().toString(),name:newM.trim()}]);setNewM("");};
+  const addM=()=>{
+    if(!newM.trim())return;
+    const nextId = "m"+(Math.max(0,...lm.map(m=>parseInt(m.id.replace(/\D/g,""))||0))+1);
+    setLm(ms=>[...ms,{id:nextId,name:newM.trim()}]);
+    setNewM("");
+  };
   const addP=()=>{
     if(!newP.name.trim())return;
-    setLp(ps=>[...ps,{...newP,id:Date.now().toString(),targetAppo:Number(newP.targetAppo)||0}]);
+    const nextId = "p"+(Math.max(0,...lp.map(p=>parseInt(p.id.replace(/\D/g,""))||0))+1);
+    setLp(ps=>[...ps,{...newP,id:nextId,targetAppo:Number(newP.targetAppo)||0}]);
     setNewP({name:"",targetAppo:"",memberIds:[],lists:[]});
   };
   const toggleM=(mId,pidx)=>setLp(ps=>ps.map((p,i)=>{
