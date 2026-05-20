@@ -345,9 +345,15 @@ function ReportFormView({members, projects, onSubmit, loading}) {
   const [error,setError]=useState("");
   const [sending,setSending]=useState(false);
 
-  const memberProjects=memberId?projects.filter(p=>p.memberIds?.includes(memberId)):[];
+  const memberProjects=memberId?projects.filter(p=>(p.memberIds||[]).map(x=>String(x)).includes(String(memberId))):[];
   const currentProject=projects.find(p=>p.id===projectId);
-  const listOptions=currentProject?.lists||[];
+  // listsが文字列で来た場合も配列に変換する（読み込みタイミングのずれ対策）
+  const rawLists = currentProject?.lists;
+  const listOptions = Array.isArray(rawLists)
+    ? rawLists
+    : (typeof rawLists === "string" && rawLists.startsWith("["))
+      ? (() => { try { return JSON.parse(rawLists); } catch(e) { return []; } })()
+      : rawLists ? [rawLists] : [];
 
   const setEntry=(i,k,v)=>setEntries(es=>es.map((e,j)=>j===i?{...e,[k]:v}:e));
   const addEntry=()=>setEntries(es=>[...es,EMPTY_ENTRY()]);
@@ -394,7 +400,7 @@ function ReportFormView({members, projects, onSubmit, loading}) {
         <div><label className="form-label">案件
           {!memberId&&<span style={{color:"var(--muted)",fontWeight:400,fontSize:11}}> ← 先に名前を選んでください</span>}
         </label>
-          <select className="form-select" value={projectId} onChange={e=>setProjectId(e.target.value)} disabled={!memberId}>
+          <select className="form-select" value={projectId} onChange={e=>{setProjectId(e.target.value);setEntries([EMPTY_ENTRY()]);}} disabled={!memberId}>
             <option value="">選択してください</option>
             {memberProjects.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}
           </select>
@@ -565,7 +571,10 @@ function AdminView({members, projects, onSaveMembers, onSaveProjects, loading}) 
   };
   const toggleM=(mId,pidx)=>setLp(ps=>ps.map((p,i)=>{
     if(i!==pidx)return p;
-    const ids=p.memberIds?.includes(mId)?p.memberIds.filter(x=>x!==mId):[...(p.memberIds||[]),mId];
+    // IDはすべて文字列に統一・重複排除
+    const current=[...new Set((p.memberIds||[]).map(x=>String(x)))];
+    const sid=String(mId);
+    const ids=current.includes(sid)?current.filter(x=>x!==sid):[...current,sid];
     return{...p,memberIds:ids};
   }));
   const addList=(pidx)=>{
@@ -676,16 +685,20 @@ function App() {
       try {
         const data = await apiGet();
         // listsとmemberIdsが文字列で来た場合もパースして必ず配列にする
-        const projects = (data.projects||[]).map(p => ({
-          ...p,
-          lists: Array.isArray(p.lists) ? p.lists
+        const projects = (data.projects||[]).map(p => {
+          // listsを配列に変換
+          let lists = Array.isArray(p.lists) ? p.lists
             : (typeof p.lists === "string" && p.lists.startsWith("["))
-              ? JSON.parse(p.lists) : p.lists ? [p.lists] : [],
-          memberIds: Array.isArray(p.memberIds) ? p.memberIds
+              ? JSON.parse(p.lists) : p.lists ? [p.lists] : [];
+          // memberIdsを配列に変換・文字列統一・重複排除
+          let rawIds = Array.isArray(p.memberIds) ? p.memberIds
             : (typeof p.memberIds === "string" && p.memberIds.startsWith("["))
-              ? JSON.parse(p.memberIds) : p.memberIds ? [p.memberIds] : [],
-        }));
-        setMembers(data.members?.length ? data.members : DEFAULT_MEMBERS);
+              ? JSON.parse(p.memberIds) : p.memberIds ? [p.memberIds] : [];
+          let memberIds = [...new Set(rawIds.map(x=>String(x)))];
+          return {...p, lists, memberIds};
+        });
+        const members = (data.members||[]).map(m=>({...m, id:String(m.id)}));
+        setMembers(members.length ? members : DEFAULT_MEMBERS);
         setProjects(projects.length ? projects : DEFAULT_PROJECTS);
         setReports((data.reports||[]).map(r => ({
           ...r,
