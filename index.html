@@ -545,7 +545,7 @@ function AdminView({members, projects, onSaveMembers, onSaveProjects, loading}) 
   const [saving,setSaving]=useState(false);
   const [error,setError]=useState("");
 
-  useEffect(()=>setLm(members),[members]);
+  useEffect(()=>setLm(members.map(m=>({...m,id:String(m.id)}))),[members]);
   useEffect(()=>setLp(projects),[projects]);
 
   const save=async()=>{
@@ -643,7 +643,7 @@ function AdminView({members, projects, onSaveMembers, onSaveProjects, loading}) 
             <div style={{fontSize:11,color:"var(--muted)",marginBottom:6,fontWeight:700}}>担当メンバー（クリックで選択）</div>
             <div style={{marginBottom:14,display:"flex",flexWrap:"wrap",gap:4}}>
               {lm.map(m=>(
-                <span key={m.id} className={`member-tag ${p.memberIds?.includes(m.id)?"selected":""}`}
+                <span key={m.id} className={`member-tag ${(p.memberIds||[]).map(x=>String(x)).includes(String(m.id))?"selected":""}`}
                   onClick={()=>toggleM(m.id,pidx)}>{m.name}</span>
               ))}
             </div>
@@ -693,7 +693,8 @@ function App() {
           // memberIdsを配列に変換・文字列統一・重複排除
           let rawIds = Array.isArray(p.memberIds) ? p.memberIds
             : (typeof p.memberIds === "string" && p.memberIds.startsWith("["))
-              ? JSON.parse(p.memberIds) : p.memberIds ? [p.memberIds] : [];
+              ? (() => { try { return JSON.parse(p.memberIds); } catch(e) { return []; } })()
+              : p.memberIds ? [p.memberIds] : [];
           let memberIds = [...new Set(rawIds.map(x=>String(x)))];
           return {...p, lists, memberIds};
         });
