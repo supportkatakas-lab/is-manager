@@ -136,20 +136,23 @@ const CALL_FIELDS = [
   {key:"materialReception", label:"受付資料請求", color:"var(--yellow)"},
 ];
 
-const EMPTY_ENTRY = () => ({listName:"",calls:"",appo:"",materialSelf:"",noAnswer:"",absent:"",rejectedSelf:"",rejectedReception:"",materialReception:""});
+const EMPTY_ENTRY = () => ({listName:"",workHours:"",calls:"",appo:"",materialSelf:"",noAnswer:"",absent:"",rejectedSelf:"",rejectedReception:"",materialReception:""});
 
 function calcStats(reports) {
-  const t = {calls:0,appo:0,materialSelf:0,noAnswer:0,absent:0,rejectedSelf:0,rejectedReception:0,materialReception:0};
+  const t = {workHours:0,calls:0,appo:0,materialSelf:0,noAnswer:0,absent:0,rejectedSelf:0,rejectedReception:0,materialReception:0};
   reports.forEach(r => {
     const entries = r.entries && r.entries.length ? r.entries : [r];
     entries.forEach(e => { Object.keys(t).forEach(k => { t[k] += Number(e[k])||0; }); });
   });
   const connected = t.appo + t.materialSelf + t.absent + t.rejectedSelf;
+  const listCaDenom = t.appo + t.materialSelf + t.rejectedSelf;
   return {
     ...t, connected,
-    appoRate:    t.calls>0 ? ((t.appo/t.calls)*100).toFixed(1) : "0.0",
-    connectRate: t.calls>0 ? ((connected/t.calls)*100).toFixed(1) : "0.0",
-    caRate:      connected>0 ? (((t.appo+t.materialSelf)/connected)*100).toFixed(1) : "0.0",
+    appoRate:      t.calls>0 ? ((t.appo/t.calls)*100).toFixed(1) : "0.0",
+    connectRate:   t.calls>0 ? ((connected/t.calls)*100).toFixed(1) : "0.0",
+    caRate:        connected>0 ? (((t.appo+t.materialSelf)/connected)*100).toFixed(1) : "0.0",
+    listCaRate:    listCaDenom>0 ? ((t.appo/listCaDenom)*100).toFixed(1) : "0.0",
+    callsPerHour:  t.workHours>0 ? (t.calls/t.workHours).toFixed(1) : "-",
   };
 }
 
@@ -275,7 +278,7 @@ function DashboardView({members, projects, reports, loading}) {
           <div className="card-title">リスト別詳細</div>
           <div className="tbl-wrap">
             <table>
-              <thead><tr><th>案件</th><th>リスト名</th><th>架電</th><th>アポ</th><th>本人資料</th><th>不通</th><th>不在</th><th>本人拒否</th><th>受付拒否</th><th>受付資料</th><th>アポ率</th><th>通電率</th></tr></thead>
+              <thead><tr><th>案件</th><th>リスト名</th><th>架電</th><th>アポ</th><th>本人資料</th><th>不通</th><th>不在</th><th>本人拒否</th><th>受付拒否</th><th>受付資料</th><th>アポ率</th><th>通電率</th><th>CA率</th></tr></thead>
               <tbody>
                 {Object.values(listMap).map((ls,i)=>{
                   const s=calcStats([{entries:ls.rows}]);
@@ -291,6 +294,7 @@ function DashboardView({members, projects, reports, loading}) {
                       <td style={{color:"var(--red)"}}>{s.rejectedReception}</td>
                       <td>{s.materialReception}</td>
                       <td>{s.appoRate}%</td><td>{s.connectRate}%</td>
+                      <td style={{color:"var(--green)",fontWeight:700}}>{s.listCaRate}%</td>
                     </tr>
                   );
                 })}
@@ -304,7 +308,7 @@ function DashboardView({members, projects, reports, loading}) {
         <div className="card-title">メンバー別実績</div>
         <div className="tbl-wrap">
           <table>
-            <thead><tr><th>名前</th><th>報告数</th><th>架電</th><th>アポ</th><th>アポ率</th><th>通電率</th><th>CA率</th></tr></thead>
+            <thead><tr><th>名前</th><th>報告数</th><th>稼働時間</th><th>架電</th><th>1h当りコール</th><th>アポ</th><th>アポ率</th><th>通電率</th><th>CA率</th></tr></thead>
             <tbody>
               {members.map(m=>{
                 const mr=filtered.filter(r=>r.memberId===m.id);
@@ -314,14 +318,16 @@ function DashboardView({members, projects, reports, loading}) {
                   <tr key={m.id}>
                     <td style={{fontWeight:700}}>{m.name}</td>
                     <td><span className="badge badge-blue">{mr.length}日</span></td>
+                    <td>{s.workHours>0?s.workHours+"h":"-"}</td>
                     <td>{s.calls}</td>
+                    <td style={{color:"var(--accent2)",fontWeight:700}}>{s.callsPerHour}</td>
                     <td style={{color:"var(--accent)",fontWeight:700}}>{s.appo}</td>
                     <td>{s.appoRate}%</td><td>{s.connectRate}%</td><td>{s.caRate}%</td>
                   </tr>
                 );
               })}
               {members.every(m=>filtered.filter(r=>r.memberId===m.id).length===0)&&(
-                <tr><td colSpan={7} className="empty">報告データがありません</td></tr>
+                <tr><td colSpan={9} className="empty">報告データがありません</td></tr>
               )}
             </tbody>
           </table>
@@ -415,6 +421,12 @@ function ReportFormView({members, projects, onSubmit, loading}) {
                 onChange={e=>setEntry(i,"listName",e.target.value)} disabled={!projectId}/>
             }
           </div>
+          <div style={{marginBottom:12}}>
+            <label className="form-label">稼働時間（例：3.5）</label>
+            <input className="form-input" type="number" min="0" step="0.5" placeholder="例：3.5"
+              value={entry.workHours} onChange={e=>setEntry(i,"workHours",e.target.value)}
+              style={{maxWidth:160}}/>
+          </div>
           <div className="call-grid">
             {CALL_FIELDS.map(f=>(
               <div className="call-field" key={f.key}>
@@ -490,6 +502,7 @@ function ReportsView({members, projects, reports, onDelete, loading}) {
                       <td>{s.calls}</td>
                       <td style={{color:"var(--accent)",fontWeight:700}}>{s.appo}</td>
                       <td>{s.appoRate}%</td><td>{s.connectRate}%</td>
+                      <td style={{color:"var(--green)",fontWeight:700}}>{s.listCaRate}%</td>
                       <td><button className="btn btn-danger" onClick={()=>onDelete(r.id)}>削除</button></td>
                     </tr>
                     {isExp&&(r.entries||[]).map((e,i)=>{
