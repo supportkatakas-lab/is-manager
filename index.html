@@ -675,9 +675,24 @@ function App() {
     (async()=>{
       try {
         const data = await apiGet();
+        // listsとmemberIdsが文字列で来た場合もパースして必ず配列にする
+        const projects = (data.projects||[]).map(p => ({
+          ...p,
+          lists: Array.isArray(p.lists) ? p.lists
+            : (typeof p.lists === "string" && p.lists.startsWith("["))
+              ? JSON.parse(p.lists) : p.lists ? [p.lists] : [],
+          memberIds: Array.isArray(p.memberIds) ? p.memberIds
+            : (typeof p.memberIds === "string" && p.memberIds.startsWith("["))
+              ? JSON.parse(p.memberIds) : p.memberIds ? [p.memberIds] : [],
+        }));
         setMembers(data.members?.length ? data.members : DEFAULT_MEMBERS);
-        setProjects(data.projects?.length ? data.projects : DEFAULT_PROJECTS);
-        setReports(data.reports||[]);
+        setProjects(projects.length ? projects : DEFAULT_PROJECTS);
+        setReports((data.reports||[]).map(r => ({
+          ...r,
+          entries: Array.isArray(r.entries) ? r.entries
+            : (typeof r.entries === "string" && r.entries.startsWith("["))
+              ? JSON.parse(r.entries) : [],
+        })));
       } catch(e) {
         setInitError("スプレッドシートへの接続に失敗しました。GASのURLを確認してください。");
         setMembers(DEFAULT_MEMBERS);
