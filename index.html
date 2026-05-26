@@ -134,6 +134,7 @@ const CALL_FIELDS = [
 ];
 
 const EMPTY_ENTRY = () => ({listName:"",workHours:"",calls:"",appo:"",materialSelf:"",noAnswer:"",absent:"",rejectedSelf:"",rejectedReception:"",materialReception:""});
+const EMPTY_IMPRESSION = () => "";
 
 function calcStats(reports) {
   const t = {workHours:0,calls:0,appo:0,materialSelf:0,noAnswer:0,absent:0,rejectedSelf:0,rejectedReception:0,materialReception:0};
@@ -302,30 +303,44 @@ function DashboardView({members, projects, reports, loading}) {
       )}
 
       <div className="card">
-        <div className="card-title">メンバー別実績</div>
+        <div className="card-title">メンバー別実績（案件ごと）</div>
         <div className="tbl-wrap">
           <table>
-            <thead><tr><th>名前</th><th>報告数</th><th>稼働時間</th><th>架電</th><th>1h当りコール</th><th>アポ</th><th>アポ率</th><th>通電率</th><th>CA率</th></tr></thead>
+            <thead><tr><th>名前</th><th>案件</th><th>報告数</th><th>稼働時間</th><th>架電</th><th>1h当りコール</th><th>アポ</th><th>アポ率</th><th>通電率</th><th>CA率</th></tr></thead>
             <tbody>
-              {members.map(m=>{
-                const mr=filtered.filter(r=>r.memberId===m.id);
-                if(!mr.length)return null;
-                const s=calcStats(mr);
-                return(
-                  <tr key={m.id}>
-                    <td style={{fontWeight:700}}>{m.name}</td>
-                    <td><span className="badge badge-blue">{mr.length}日</span></td>
-                    <td>{s.workHours>0?s.workHours+"h":"-"}</td>
-                    <td>{s.calls}</td>
-                    <td style={{color:"var(--accent2)",fontWeight:700}}>{s.callsPerHour}</td>
-                    <td style={{color:"var(--accent)",fontWeight:700}}>{s.appo}</td>
-                    <td>{s.appoRate}%</td><td>{s.connectRate}%</td><td>{s.caRate}%</td>
-                  </tr>
-                );
-              })}
-              {members.every(m=>filtered.filter(r=>r.memberId===m.id).length===0)&&(
-                <tr><td colSpan={9} className="empty">報告データがありません</td></tr>
-              )}
+              {(()=>{
+                const rows=[];
+                members.forEach(m=>{
+                  const mr=filtered.filter(r=>r.memberId===m.id);
+                  if(!mr.length)return;
+                  // 案件ごとに集計
+                  const byProject={};
+                  mr.forEach(r=>{
+                    if(!byProject[r.projectId])byProject[r.projectId]=[];
+                    byProject[r.projectId].push(r);
+                  });
+                  const pIds=Object.keys(byProject);
+                  pIds.forEach((pId,pi)=>{
+                    const pr=byProject[pId];
+                    const s=calcStats(pr);
+                    const pName=projects.find(p=>p.id===pId)?.name||pId;
+                    rows.push(
+                      <tr key={m.id+"-"+pId}>
+                        {pi===0&&<td style={{fontWeight:700,verticalAlign:"top"}} rowSpan={pIds.length}>{m.name}</td>}
+                        <td><span className="badge badge-blue">{pName}</span></td>
+                        <td><span className="badge badge-blue">{pr.length}日</span></td>
+                        <td>{s.workHours>0?s.workHours+"h":"-"}</td>
+                        <td>{s.calls}</td>
+                        <td style={{color:"var(--accent2)",fontWeight:700}}>{s.callsPerHour}</td>
+                        <td style={{color:"var(--accent)",fontWeight:700}}>{s.appo}</td>
+                        <td>{s.appoRate}%</td><td>{s.connectRate}%</td><td>{s.caRate}%</td>
+                      </tr>
+                    );
+                  });
+                });
+                if(!rows.length) return <tr><td colSpan={10} className="empty">報告データがありません</td></tr>;
+                return rows;
+              })()}
             </tbody>
           </table>
         </div>
@@ -341,6 +356,7 @@ function ReportFormView({members, projects, onSubmit, loading}) {
   const [memberId,setMemberId]=useState("");
   const [projectId,setProjectId]=useState("");
   const [entries,setEntries]=useState([EMPTY_ENTRY()]);
+  const [impression,setImpression]=useState("");
   const [submitted,setSubmitted]=useState(false);
   const [error,setError]=useState("");
   const [sending,setSending]=useState(false);
@@ -358,7 +374,7 @@ function ReportFormView({members, projects, onSubmit, loading}) {
   const setEntry=(i,k,v)=>setEntries(es=>es.map((e,j)=>j===i?{...e,[k]:v}:e));
   const addEntry=()=>setEntries(es=>[...es,EMPTY_ENTRY()]);
   const removeEntry=i=>setEntries(es=>es.filter((_,j)=>j!==i));
-  const reset=()=>{setMemberId("");setProjectId("");setDate(today);setEntries([EMPTY_ENTRY()]);setSubmitted(false);setError("");};
+  const reset=()=>{setMemberId("");setProjectId("");setDate(today);setEntries([EMPTY_ENTRY()]);setImpression("");setSubmitted(false);setError("");};
 
   const handleSubmit=async()=>{
     if(!memberId){setError("名前を選択してください");return;}
@@ -367,7 +383,7 @@ function ReportFormView({members, projects, onSubmit, loading}) {
     if(entries.some(e=>!e.calls)){setError("架電数を入力してください");return;}
     setError(""); setSending(true);
     try {
-      await onSubmit({id:Date.now().toString(),createdAt:new Date().toISOString(),date,memberId,projectId,entries});
+      await onSubmit({id:Date.now().toString(),createdAt:new Date().toISOString(),date,memberId,projectId,entries,impression});
       setSubmitted(true);
     } catch(e) {
       setError("送信に失敗しました。もう一度お試しください。");
@@ -443,6 +459,16 @@ function ReportFormView({members, projects, onSubmit, loading}) {
         </div>
       ))}
 
+      <div style={{marginTop:14,background:"#fff",border:"1.5px solid var(--border)",borderRadius:10,padding:16}}>
+        <label className="form-label" style={{marginBottom:8}}>📝 所感・メモ（任意）</label>
+        <textarea
+          className="form-input"
+          placeholder="今日のコールで気づいたこと、トークのポイント、リストの質感など自由に記入してください"
+          value={impression}
+          onChange={e=>setImpression(e.target.value)}
+          style={{minHeight:100,resize:"vertical",lineHeight:1.6}}
+        />
+      </div>
       <div style={{display:"flex",gap:10,marginTop:14,justifyContent:"space-between"}}>
         <button className="btn btn-ghost" onClick={addEntry}>＋ リストを追加</button>
         <button className="btn btn-primary" onClick={handleSubmit} disabled={sending} style={{minWidth:130}}>
@@ -488,9 +514,9 @@ function ReportsView({members, projects, reports, onDelete, loading}) {
       <div className="card">
         <div className="tbl-wrap">
           <table>
-            <thead><tr><th></th><th>日付</th><th>名前</th><th>案件</th><th>リスト数</th><th>架電</th><th>アポ</th><th>アポ率</th><th>通電率</th><th></th></tr></thead>
+            <thead><tr><th></th><th>日付</th><th>名前</th><th>案件</th><th>リスト数</th><th>架電</th><th>アポ</th><th>アポ率</th><th>通電率</th><th>所感</th><th></th></tr></thead>
             <tbody>
-              {filtered.length===0&&<tr><td colSpan={10} className="empty">報告がありません</td></tr>}
+              {filtered.length===0&&<tr><td colSpan={11} className="empty">報告がありません</td></tr>}
               {filtered.map(r=>{
                 const s=calcStats([r]);
                 const isExp=expandedId===r.id;
@@ -506,6 +532,8 @@ function ReportsView({members, projects, reports, onDelete, loading}) {
                       <td style={{color:"var(--accent)",fontWeight:700}}>{s.appo}</td>
                       <td>{s.appoRate}%</td><td>{s.connectRate}%</td>
                       <td style={{color:"var(--green)",fontWeight:700}}>{s.listCaRate}%</td>
+                      <td style={{maxWidth:180,overflow:"hidden",textOverflow:"ellipsis",color:"var(--muted)",fontSize:12,whiteSpace:"nowrap"}}
+                        title={r.impression||""}>{r.impression||"-"}</td>
                       <td><button className="btn btn-danger" onClick={()=>onDelete(r.id)}>削除</button></td>
                     </tr>
                     {isExp&&(r.entries||[]).map((e,i)=>{
@@ -539,7 +567,7 @@ function AdminView({members, projects, onSaveMembers, onSaveProjects, loading}) 
   const [lm,setLm]=useState(members);
   const [lp,setLp]=useState(projects);
   const [newM,setNewM]=useState("");
-  const [newP,setNewP]=useState({name:"",targetAppo:"",memberIds:[],lists:[]});
+  const [newP,setNewP]=useState({name:"",targetAppo:"",memberIds:[],lists:[],slackWebhook:""});
   const [listInputs,setListInputs]=useState({});
   const [savedMsg,setSavedMsg]=useState("");
   const [saving,setSaving]=useState(false);
@@ -573,7 +601,7 @@ function AdminView({members, projects, onSaveMembers, onSaveProjects, loading}) 
     if(!newP.name.trim())return;
     const nextId = "p"+(Math.max(0,...lp.map(p=>parseInt(p.id.replace(/\D/g,""))||0))+1);
     setLp(ps=>[...ps,{...newP,id:nextId,targetAppo:Number(newP.targetAppo)||0}]);
-    setNewP({name:"",targetAppo:"",memberIds:[],lists:[]});
+    setNewP({name:"",targetAppo:"",memberIds:[],lists:[],slackWebhook:""});
   };
   const toggleM=(mId,pidx)=>setLp(ps=>ps.map((p,i)=>{
     if(i!==pidx)return p;
@@ -629,10 +657,14 @@ function AdminView({members, projects, onSaveMembers, onSaveProjects, loading}) 
 
       <div className="card">
         <div className="card-title">案件管理</div>
-        <div style={{display:"grid",gridTemplateColumns:"1fr auto auto",gap:8,marginBottom:14}}>
+        <div style={{display:"grid",gridTemplateColumns:"1fr auto auto",gap:8,marginBottom:8}}>
           <input className="form-input" placeholder="案件名" value={newP.name} onChange={e=>setNewP(p=>({...p,name:e.target.value}))}/>
           <input className="form-input" placeholder="目標アポ数" type="number" style={{width:100}} value={newP.targetAppo} onChange={e=>setNewP(p=>({...p,targetAppo:e.target.value}))}/>
           <button className="btn btn-primary" onClick={addP}>追加</button>
+        </div>
+        <div style={{marginBottom:14}}>
+          <input className="form-input" placeholder="Slack Webhook URL（任意）: https://hooks.slack.com/services/..."
+            value={newP.slackWebhook||""} onChange={e=>setNewP(p=>({...p,slackWebhook:e.target.value}))}/>
         </div>
         {lp.map((p,pidx)=>(
           <div key={p.id} style={{background:"var(--surface2)",border:"1.5px solid var(--border)",borderRadius:10,padding:16,marginBottom:12}}>
@@ -668,6 +700,17 @@ function AdminView({members, projects, onSaveMembers, onSaveProjects, loading}) 
                 onChange={e=>setListInputs(s=>({...s,[pidx]:e.target.value}))}
                 onKeyDown={e=>e.key==="Enter"&&addList(pidx)}/>
               <button className="btn btn-ghost" onClick={()=>addList(pidx)}>＋追加</button>
+            </div>
+            <div style={{marginTop:12}}>
+              <div style={{fontSize:11,color:"var(--muted)",marginBottom:6,fontWeight:700}}>
+                Slack Webhook URL（所感通知用）
+              </div>
+              <input className="form-input"
+                placeholder="https://hooks.slack.com/services/..."
+                value={p.slackWebhook||""}
+                onChange={e=>setLp(ps=>ps.map((x,j)=>j===pidx?{...x,slackWebhook:e.target.value}:x))}
+              />
+              {p.slackWebhook&&<div style={{fontSize:11,color:"var(--green)",marginTop:4}}>✅ Slack連携設定済み</div>}
             </div>
           </div>
         ))}
