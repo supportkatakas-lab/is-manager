@@ -100,13 +100,13 @@ async function apiGet() {
   return data;
 }
 async function apiPost(body) {
-  // GASのPOSTはno-corsで送信（CORSエラー回避）
-  // レスポンスは読めないが、GAS側は正常処理される
+  // GASへのPOST: フォームデータ形式で送信するとCORSを回避できる
+  const formData = new FormData();
+  formData.append("payload", JSON.stringify(body));
   await fetch(GAS_URL, {
     method: "POST",
     mode: "no-cors",
-    headers: { "Content-Type": "text/plain" },
-    body: JSON.stringify(body),
+    body: formData,
   });
   return { success: true };
 }
