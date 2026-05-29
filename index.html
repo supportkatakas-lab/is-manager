@@ -567,7 +567,7 @@ function AdminView({members, projects, onSaveMembers, onSaveProjects, loading}) 
   const [lm,setLm]=useState(members);
   const [lp,setLp]=useState(projects);
   const [newM,setNewM]=useState("");
-  const [newP,setNewP]=useState({name:"",targetAppo:"",memberIds:[],lists:[],slackWebhook:""});
+  const [newP,setNewP]=useState({name:"",targetAppo:"",targetCalls:"",targetHours:"",memberIds:[],lists:[],slackWebhook:"",weeklyMention:""});
   const [listInputs,setListInputs]=useState({});
   const [savedMsg,setSavedMsg]=useState("");
   const [saving,setSaving]=useState(false);
@@ -601,7 +601,7 @@ function AdminView({members, projects, onSaveMembers, onSaveProjects, loading}) 
     if(!newP.name.trim())return;
     const nextId = "p"+(Math.max(0,...lp.map(p=>parseInt(p.id.replace(/\D/g,""))||0))+1);
     setLp(ps=>[...ps,{...newP,id:nextId,targetAppo:Number(newP.targetAppo)||0}]);
-    setNewP({name:"",targetAppo:"",memberIds:[],lists:[],slackWebhook:""});
+    setNewP({name:"",targetAppo:"",targetCalls:"",targetHours:"",memberIds:[],lists:[],slackWebhook:"",weeklyMention:""});
   };
   const toggleM=(mId,pidx)=>setLp(ps=>ps.map((p,i)=>{
     if(i!==pidx)return p;
@@ -657,9 +657,11 @@ function AdminView({members, projects, onSaveMembers, onSaveProjects, loading}) 
 
       <div className="card">
         <div className="card-title">案件管理</div>
-        <div style={{display:"grid",gridTemplateColumns:"1fr auto auto",gap:8,marginBottom:8}}>
+        <div style={{display:"grid",gridTemplateColumns:"1fr auto auto auto auto",gap:8,marginBottom:8,alignItems:"center"}}>
           <input className="form-input" placeholder="案件名" value={newP.name} onChange={e=>setNewP(p=>({...p,name:e.target.value}))}/>
-          <input className="form-input" placeholder="目標アポ数" type="number" style={{width:100}} value={newP.targetAppo} onChange={e=>setNewP(p=>({...p,targetAppo:e.target.value}))}/>
+          <input className="form-input" placeholder="目標アポ数" type="number" style={{width:90}} value={newP.targetAppo} onChange={e=>setNewP(p=>({...p,targetAppo:e.target.value}))}/>
+          <input className="form-input" placeholder="目標コール数" type="number" style={{width:100}} value={newP.targetCalls} onChange={e=>setNewP(p=>({...p,targetCalls:e.target.value}))}/>
+          <input className="form-input" placeholder="目標稼働時間" type="number" style={{width:110}} value={newP.targetHours} onChange={e=>setNewP(p=>({...p,targetHours:e.target.value}))}/>
           <button className="btn btn-primary" onClick={addP}>追加</button>
         </div>
         <div style={{marginBottom:14}}>
@@ -668,13 +670,23 @@ function AdminView({members, projects, onSaveMembers, onSaveProjects, loading}) 
         </div>
         {lp.map((p,pidx)=>(
           <div key={p.id} style={{background:"var(--surface2)",border:"1.5px solid var(--border)",borderRadius:10,padding:16,marginBottom:12}}>
-            <div style={{display:"grid",gridTemplateColumns:"1fr auto auto",gap:8,marginBottom:12,alignItems:"center"}}>
+            <div style={{display:"grid",gridTemplateColumns:"1fr auto auto auto auto",gap:8,marginBottom:12,alignItems:"center"}}>
               <input className="form-input" value={p.name}
                 onChange={e=>setLp(ps=>ps.map((x,j)=>j===pidx?{...x,name:e.target.value}:x))}/>
-              <div style={{display:"flex",alignItems:"center",gap:6}}>
+              <div style={{display:"flex",alignItems:"center",gap:4}}>
                 <span style={{fontSize:11,color:"var(--muted)",whiteSpace:"nowrap",fontWeight:700}}>目標アポ</span>
-                <input className="form-input" type="number" style={{width:70}} value={p.targetAppo}
+                <input className="form-input" type="number" style={{width:65}} value={p.targetAppo}
                   onChange={e=>setLp(ps=>ps.map((x,j)=>j===pidx?{...x,targetAppo:Number(e.target.value)}:x))}/>
+              </div>
+              <div style={{display:"flex",alignItems:"center",gap:4}}>
+                <span style={{fontSize:11,color:"var(--muted)",whiteSpace:"nowrap",fontWeight:700}}>目標コール</span>
+                <input className="form-input" type="number" style={{width:75}} value={p.targetCalls||""}
+                  onChange={e=>setLp(ps=>ps.map((x,j)=>j===pidx?{...x,targetCalls:Number(e.target.value)}:x))}/>
+              </div>
+              <div style={{display:"flex",alignItems:"center",gap:4}}>
+                <span style={{fontSize:11,color:"var(--muted)",whiteSpace:"nowrap",fontWeight:700}}>目標稼働h</span>
+                <input className="form-input" type="number" style={{width:70}} value={p.targetHours||""}
+                  onChange={e=>setLp(ps=>ps.map((x,j)=>j===pidx?{...x,targetHours:Number(e.target.value)}:x))}/>
               </div>
               <button className="btn btn-danger" onClick={()=>setLp(ps=>ps.filter((_,j)=>j!==pidx))}>削除</button>
             </div>
@@ -711,6 +723,17 @@ function AdminView({members, projects, onSaveMembers, onSaveProjects, loading}) 
                 onChange={e=>setLp(ps=>ps.map((x,j)=>j===pidx?{...x,slackWebhook:e.target.value}:x))}
               />
               {p.slackWebhook&&<div style={{fontSize:11,color:"var(--green)",marginTop:4}}>✅ Slack連携設定済み</div>}
+            </div>
+            <div style={{marginTop:12}}>
+              <div style={{fontSize:11,color:"var(--muted)",marginBottom:6,fontWeight:700}}>
+                週次レポート メンション（SlackユーザーID: 例 U012AB3CD）
+              </div>
+              <input className="form-input"
+                placeholder="U012AB3CD（SlackのユーザーIDを入力）"
+                value={p.weeklyMention||""}
+                onChange={e=>setLp(ps=>ps.map((x,j)=>j===pidx?{...x,weeklyMention:e.target.value}:x))}
+              />
+              <div style={{fontSize:11,color:"var(--muted)",marginTop:4}}>※ SlackユーザーIDはプロフィール→「メンバーIDをコピー」で取得できます</div>
             </div>
           </div>
         ))}
