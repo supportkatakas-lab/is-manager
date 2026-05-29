@@ -91,6 +91,7 @@ const {useState, useEffect, useCallback, useRef} = React;
 
 // ===== GAS API URL =====
 const GAS_URL = "https://script.google.com/macros/s/AKfycbxIlzttIprsOsUfNAzR3hdlzps0KHtpztzEuAbQ2xqCqhTAmvjrjARS2SukhvI-wPV7/exec";
+const ADMIN_PASSWORD = "is00admin"; // ★ 任意のパスワードに変更してください
 
 // ===== API HELPERS =====
 async function apiGet() {
@@ -251,7 +252,7 @@ function DashboardView({members, projects, reports, loading}) {
           <table>
             <thead><tr><th>案件名</th><th>目標</th><th>アポ</th><th>進捗率</th><th>架電</th><th>アポ率</th><th>通電率</th><th>CA率</th></tr></thead>
             <tbody>
-              {projects.map(p=>{
+              {projects.filter(p=>fp==="all"||p.id===fp).map(p=>{
                 const s=calcStats(filtered.filter(r=>r.projectId===p.id));
                 const pct=p.targetAppo>0?Math.min(100,s.appo/p.targetAppo*100).toFixed(0):0;
                 const col=pct>=80?C_GREEN:pct>=50?C_YELLOW:C_ACCENT;
@@ -463,7 +464,7 @@ function ReportFormView({members, projects, onSubmit, loading}) {
         <label className="form-label" style={{marginBottom:8}}>📝 所感・メモ（任意）</label>
         <textarea
           className="form-input"
-          placeholder="今日のコールで気づいたこと、トークのポイント、リストの質感など自由に記入してください"
+          placeholder="所感テンプレをもとに入力してください"
           value={impression}
           onChange={e=>setImpression(e.target.value)}
           style={{minHeight:100,resize:"vertical",lineHeight:1.6}}
@@ -533,7 +534,7 @@ function ReportsView({members, projects, reports, onDelete, loading}) {
                       <td>{s.appoRate}%</td><td>{s.connectRate}%</td>
                       <td style={{color:"var(--green)",fontWeight:700}}>{s.listCaRate}%</td>
                       <td style={{maxWidth:180,overflow:"hidden",textOverflow:"ellipsis",color:"var(--muted)",fontSize:12,whiteSpace:"nowrap"}}
-                        title={r.impression||""}>{r.impression||"-"}</td>
+                        title={r.impression||""}>{r.impression&&r.impression.trim()&&r.impression!=="0.0%"?r.impression:"-"}</td>
                       <td><button className="btn btn-danger" onClick={()=>onDelete(r.id)}>削除</button></td>
                     </tr>
                     {isExp&&(r.entries||[]).map((e,i)=>{
@@ -742,9 +743,38 @@ function AdminView({members, projects, onSaveMembers, onSaveProjects, loading}) 
   );
 }
 
+// ===== ADMIN LOGIN =====
+function AdminLogin({onLogin}) {
+  const [pw, setPw] = useState("");
+  const [error, setError] = useState("");
+  const handleLogin = () => {
+    if (pw === ADMIN_PASSWORD) { onLogin(); }
+    else { setError("パスワードが違います"); setPw(""); }
+  };
+  return (
+    <div style={{minHeight:"100vh",background:"var(--bg)",display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
+      <div style={{background:"#fff",border:"1.5px solid var(--border)",borderRadius:12,padding:32,width:"100%",maxWidth:360,boxShadow:"0 4px 20px rgba(0,0,0,.08)"}}>
+        <div style={{fontSize:18,fontWeight:700,color:"var(--text)",marginBottom:6}}>管理者ログイン</div>
+        <div style={{fontSize:13,color:"var(--muted)",marginBottom:24}}>ダッシュボード・報告一覧・マスタ管理にアクセスするにはパスワードが必要です</div>
+        {error&&<div className="error-msg" style={{marginBottom:12}}>⚠️ {error}</div>}
+        <div style={{marginBottom:16}}>
+          <label className="form-label">パスワード</label>
+          <input className="form-input" type="password" value={pw}
+            onChange={e=>setPw(e.target.value)}
+            onKeyDown={e=>e.key==="Enter"&&handleLogin()}
+            placeholder="パスワードを入力"/>
+        </div>
+        <button className="btn btn-primary" onClick={handleLogin} style={{width:"100%"}}>ログイン</button>
+      </div>
+    </div>
+  );
+}
+
 // ===== ROOT =====
 function App() {
   const [tab,setTab]=useState("report");
+  const [isAdmin,setIsAdmin]=useState(false);
+  const [showAdminLogin,setShowAdminLogin]=useState(false);
   const [members,setMembers]=useState([]);
   const [projects,setProjects]=useState([]);
   const [reports,setReports]=useState([]);
@@ -807,12 +837,14 @@ function App() {
     await apiPost({action:"deleteReport",id});
   },[]);
 
-  const tabs=[
+  const memberTabs=[{key:"report",label:"📋 日次報告"}];
+  const adminTabs=[
     {key:"report",    label:"📋 日次報告"},
     {key:"dashboard", label:"📊 ダッシュボード"},
     {key:"reports",   label:"🗂 報告一覧"},
     {key:"admin",     label:"⚙️ マスタ管理"},
   ];
+  const tabs = isAdmin ? adminTabs : memberTabs;
 
   return(
     <div className="app">
@@ -821,13 +853,27 @@ function App() {
         {tabs.map(t=>(
           <button key={t.key} className={`nav-tab ${tab===t.key?"active":""}`} onClick={()=>setTab(t.key)}>{t.label}</button>
         ))}
+        <div style={{marginLeft:"auto"}}>
+          {isAdmin
+            ? <button className="nav-tab" onClick={()=>{setIsAdmin(false);setTab("report");}}>ログアウト</button>
+            : <button className="nav-tab" onClick={()=>setShowAdminLogin(true)}>管理者</button>
+          }
+        </div>
       </nav>
+      {showAdminLogin&&(
+        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.5)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center"}}
+          onClick={()=>setShowAdminLogin(false)}>
+          <div onClick={e=>e.stopPropagation()}>
+            <AdminLogin onLogin={()=>{setIsAdmin(true);setShowAdminLogin(false);setTab("dashboard");}}/>
+          </div>
+        </div>
+      )}
       <main className="main">
         {initError&&<div className="error-msg" style={{marginBottom:16}}>⚠️ {initError}</div>}
-        {tab==="dashboard"&&<DashboardView members={members} projects={projects} reports={reports} loading={loading}/>}
+        {tab==="dashboard"&&isAdmin&&<DashboardView members={members} projects={projects} reports={reports} loading={loading}/>}
         {tab==="report"   &&<ReportFormView members={members} projects={projects} onSubmit={addReport} loading={loading}/>}
-        {tab==="reports"  &&<ReportsView    members={members} projects={projects} reports={reports} onDelete={deleteReport} loading={loading}/>}
-        {tab==="admin"    &&<AdminView       members={members} projects={projects} onSaveMembers={saveMembers} onSaveProjects={saveProjects} loading={loading}/>}
+        {tab==="reports"  &&isAdmin&&<ReportsView    members={members} projects={projects} reports={reports} onDelete={deleteReport} loading={loading}/>}
+        {tab==="admin"    &&isAdmin&&<AdminView       members={members} projects={projects} onSaveMembers={saveMembers} onSaveProjects={saveProjects} loading={loading}/>}
       </main>
     </div>
   );
