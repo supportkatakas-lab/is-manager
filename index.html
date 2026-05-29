@@ -145,13 +145,15 @@ function calcStats(reports) {
   });
   const connected = t.appo + t.materialSelf + t.absent + t.rejectedSelf;
   const listCaDenom = t.appo + t.materialSelf + t.rejectedSelf;
+  const selfConnected = t.appo + t.rejectedSelf + t.materialSelf;
   return {
     ...t, connected,
-    appoRate:      t.calls>0 ? ((t.appo/t.calls)*100).toFixed(1) : "0.0",
-    connectRate:   t.calls>0 ? ((connected/t.calls)*100).toFixed(1) : "0.0",
-    caRate:        connected>0 ? (((t.appo+t.materialSelf)/connected)*100).toFixed(1) : "0.0",
-    listCaRate:    listCaDenom>0 ? ((t.appo/listCaDenom)*100).toFixed(1) : "0.0",
-    callsPerHour:  t.workHours>0 ? (t.calls/t.workHours).toFixed(1) : "-",
+    appoRate:        t.calls>0 ? ((t.appo/t.calls)*100).toFixed(1) : "0.0",
+    connectRate:     t.calls>0 ? ((connected/t.calls)*100).toFixed(1) : "0.0",
+    caRate:          connected>0 ? (((t.appo+t.materialSelf)/connected)*100).toFixed(1) : "0.0",
+    listCaRate:      listCaDenom>0 ? ((t.appo/listCaDenom)*100).toFixed(1) : "0.0",
+    callsPerHour:    t.workHours>0 ? (t.calls/t.workHours).toFixed(1) : "-",
+    selfConnectRate: t.calls>0 ? ((selfConnected/t.calls)*100).toFixed(1) : "0.0",
   };
 }
 
@@ -250,7 +252,7 @@ function DashboardView({members, projects, reports, loading}) {
         <div className="card-title">案件別進捗</div>
         <div className="tbl-wrap">
           <table>
-            <thead><tr><th>案件名</th><th>目標</th><th>アポ</th><th>進捗率</th><th>架電</th><th>アポ率</th><th>通電率</th><th>CA率</th></tr></thead>
+            <thead><tr><th>案件名</th><th>目標</th><th>アポ</th><th>進捗率</th><th>架電</th><th>残コール</th><th>残稼働h</th><th>アポ率</th><th>通電率</th><th>本人接続率</th><th>CA率</th></tr></thead>
             <tbody>
               {projects.filter(p=>fp==="all"||p.id===fp).map(p=>{
                 const s=calcStats(filtered.filter(r=>r.projectId===p.id));
@@ -263,7 +265,16 @@ function DashboardView({members, projects, reports, loading}) {
                     <td style={{color:"var(--accent)",fontWeight:700}}>{s.appo}</td>
                     <td><span style={{fontSize:12,fontWeight:700,color:col}}>{pct}%</span>
                       <div className="progress-bar"><div className="progress-fill" style={{width:pct+"%",background:col}}/></div></td>
-                    <td>{s.calls}</td><td>{s.appoRate}%</td><td>{s.connectRate}%</td><td>{s.caRate}%</td>
+                    <td>{s.calls}</td>
+                    <td style={{color:p.targetCalls>0&&(p.targetCalls-s.calls)<=0?"var(--red)":"var(--text)"}}>
+                      {p.targetCalls>0?Math.max(0,p.targetCalls-s.calls)+"件":"-"}
+                    </td>
+                    <td style={{color:p.targetHours>0&&(p.targetHours-s.workHours)<=0?"var(--red)":"var(--text)"}}>
+                      {p.targetHours>0?Math.max(0,p.targetHours-s.workHours).toFixed(1)+"h":"-"}
+                    </td>
+                    <td>{s.appoRate}%</td><td>{s.connectRate}%</td>
+                    <td style={{color:"var(--accent2)",fontWeight:600}}>{s.selfConnectRate}%</td>
+                    <td>{s.caRate}%</td>
                   </tr>
                 );
               })}
@@ -277,7 +288,7 @@ function DashboardView({members, projects, reports, loading}) {
           <div className="card-title">リスト別詳細</div>
           <div className="tbl-wrap">
             <table>
-              <thead><tr><th>案件</th><th>リスト名</th><th>架電</th><th>アポ</th><th>本人資料</th><th>不通</th><th>不在</th><th>本人拒否</th><th>受付拒否</th><th>受付資料</th><th>アポ率</th><th>通電率</th><th>CA率</th></tr></thead>
+              <thead><tr><th>案件</th><th>リスト名</th><th>架電</th><th>アポ</th><th>本人資料</th><th>不通</th><th>不在</th><th>本人拒否</th><th>受付拒否</th><th>受付資料</th><th>アポ率</th><th>通電率</th><th>本人接続率</th><th>CA率</th></tr></thead>
               <tbody>
                 {Object.values(listMap).map((ls,i)=>{
                   const s=calcStats([{entries:ls.rows}]);
@@ -293,6 +304,7 @@ function DashboardView({members, projects, reports, loading}) {
                       <td style={{color:"var(--red)"}}>{s.rejectedReception}</td>
                       <td>{s.materialReception}</td>
                       <td>{s.appoRate}%</td><td>{s.connectRate}%</td>
+                      <td style={{color:"var(--accent2)",fontWeight:600}}>{s.selfConnectRate}%</td>
                       <td style={{color:"var(--green)",fontWeight:700}}>{s.listCaRate}%</td>
                     </tr>
                   );
@@ -464,7 +476,7 @@ function ReportFormView({members, projects, onSubmit, loading}) {
         <label className="form-label" style={{marginBottom:8}}>📝 所感・メモ（任意）</label>
         <textarea
           className="form-input"
-          placeholder="所感テンプレをもとに入力してください"
+          placeholder="今日のコールで気づいたこと、トークのポイント、リストの質感など自由に記入してください"
           value={impression}
           onChange={e=>setImpression(e.target.value)}
           style={{minHeight:100,resize:"vertical",lineHeight:1.6}}
@@ -532,6 +544,7 @@ function ReportsView({members, projects, reports, onDelete, loading}) {
                       <td>{s.calls}</td>
                       <td style={{color:"var(--accent)",fontWeight:700}}>{s.appo}</td>
                       <td>{s.appoRate}%</td><td>{s.connectRate}%</td>
+                      <td style={{color:"var(--accent2)",fontWeight:600}}>{s.selfConnectRate}%</td>
                       <td style={{color:"var(--green)",fontWeight:700}}>{s.listCaRate}%</td>
                       <td style={{maxWidth:180,overflow:"hidden",textOverflow:"ellipsis",color:"var(--muted)",fontSize:12,whiteSpace:"nowrap"}}
                         title={r.impression||""}>{r.impression&&r.impression.trim()&&r.impression!=="0.0%"?r.impression:"-"}</td>
