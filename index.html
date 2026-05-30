@@ -541,7 +541,7 @@ function ReportsView({members, projects, reports, onDelete, loading}) {
                   <React.Fragment key={r.id}>
                     <tr>
                       <td><button className="expand-btn" onClick={()=>setExpandedId(isExp?null:r.id)}>{isExp?"▲":"▼"}</button></td>
-                      <td>{r.date}</td>
+                      <td>{r.date?String(r.date).slice(0,10):""}</td>
                       <td style={{fontWeight:700}}>{getM(r.memberId)}</td>
                       <td><span className="badge badge-blue">{getP(r.projectId)}</span></td>
                       <td><span className="badge badge-cyan">{(r.entries||[]).length}リスト</span></td>
