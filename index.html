@@ -91,7 +91,7 @@ const {useState, useEffect, useCallback, useRef} = React;
 
 // ===== GAS API URL =====
 const GAS_URL = "https://script.google.com/macros/s/AKfycbxIlzttIprsOsUfNAzR3hdlzps0KHtpztzEuAbQ2xqCqhTAmvjrjARS2SukhvI-wPV7/exec";
-const ADMIN_PASSWORD = "is2024admin"; // ★ 任意のパスワードに変更してください
+const ADMIN_PASSWORD = "admin"; // ★ 任意のパスワードに変更してください
 
 // ===== API HELPERS =====
 async function apiGet() {
@@ -480,7 +480,7 @@ function ReportFormView({members, projects, onSubmit, loading}) {
         <label className="form-label" style={{marginBottom:8}}>📝 所感・メモ（任意）</label>
         <textarea
           className="form-input"
-          placeholder="今日のコールで気づいたこと、トークのポイント、リストの質感など自由に記入してください"
+          placeholder="今まで通り各案件の所感テンプレートを活用し記入ください"
           value={impression}
           onChange={e=>setImpression(e.target.value)}
           style={{minHeight:100,resize:"vertical",lineHeight:1.6}}
