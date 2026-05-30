@@ -91,7 +91,7 @@ const {useState, useEffect, useCallback, useRef} = React;
 
 // ===== GAS API URL =====
 const GAS_URL = "https://script.google.com/macros/s/AKfycbxIlzttIprsOsUfNAzR3hdlzps0KHtpztzEuAbQ2xqCqhTAmvjrjARS2SukhvI-wPV7/exec";
-const ADMIN_PASSWORD = "is00admin"; // ★ 任意のパスワードに変更してください
+const ADMIN_PASSWORD = "is2024admin"; // ★ 任意のパスワードに変更してください
 
 // ===== API HELPERS =====
 async function apiGet() {
@@ -101,13 +101,17 @@ async function apiGet() {
   return data;
 }
 async function apiPost(body) {
-  // GASへのPOST: フォームデータ形式で送信するとCORSを回避できる
-  const formData = new FormData();
-  formData.append("payload", JSON.stringify(body));
+  // JSON文字列化してno-corsでPOST（GAS側でe.postData.contentsから読む）
+  // entriesなどのネストしたオブジェクトも正しくシリアライズされる
+  const jsonStr = JSON.stringify(body, (key, val) => {
+    // 全ての値を確実にプリミティブまたは純粋なJSON構造にする
+    return val;
+  });
   await fetch(GAS_URL, {
     method: "POST",
     mode: "no-cors",
-    body: formData,
+    headers: {"Content-Type": "text/plain"},
+    body: jsonStr,
   });
   return { success: true };
 }
