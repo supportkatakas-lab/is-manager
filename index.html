@@ -480,7 +480,7 @@ function ReportFormView({members, projects, onSubmit, loading}) {
         <label className="form-label" style={{marginBottom:8}}>📝 所感・メモ（任意）</label>
         <textarea
           className="form-input"
-          placeholder="今まで通り各案件の所感テンプレートを活用し記入ください"
+          placeholder="今まで通り、各案件のテンプレートに沿って入力ください"
           value={impression}
           onChange={e=>setImpression(e.target.value)}
           style={{minHeight:100,resize:"vertical",lineHeight:1.6}}
@@ -497,15 +497,47 @@ function ReportFormView({members, projects, onSubmit, loading}) {
 }
 
 // ===== REPORTS LIST =====
-function ReportsView({members, projects, reports, onDelete, loading}) {
-  const [fp,setFp]=useState("all"),[fm,setFm]=useState("all"),[expandedId,setExpandedId]=useState(null);
+function ReportsView({members, projects, reports, onDelete, onUpdate, loading}) {
+  const [fp,setFp]=useState("all");
+  const [fm,setFm]=useState("all");
+  const [expandedId,setExpandedId]=useState(null);
+  const [editingId,setEditingId]=useState(null);
+  const [editData,setEditData]=useState(null);
+  const [saving,setSaving]=useState(false);
+
   const getM=id=>members.find(m=>m.id===id)?.name||id;
   const getP=id=>projects.find(p=>p.id===id)?.name||id;
+
   const filtered=reports.filter(r=>{
     if(fp!=="all"&&r.projectId!==fp)return false;
     if(fm!=="all"&&r.memberId!==fm)return false;
     return true;
-  }).sort((a,b)=>b.date?.localeCompare(a.date));
+  }).sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")));
+
+  const startEdit = (r) => {
+    setEditingId(r.id);
+    setEditData(JSON.parse(JSON.stringify(r))); // deep copy
+    setExpandedId(r.id);
+  };
+
+  const cancelEdit = () => { setEditingId(null); setEditData(null); };
+
+  const saveEdit = async () => {
+    setSaving(true);
+    try {
+      await onUpdate(editData);
+      setEditingId(null);
+      setEditData(null);
+    } catch(e) { alert("保存に失敗しました"); }
+    finally { setSaving(false); }
+  };
+
+  const setEntryField = (i, k, v) => {
+    setEditData(d => {
+      const entries = d.entries.map((e,j) => j===i ? {...e,[k]:v} : e);
+      return {...d, entries};
+    });
+  };
 
   if(loading) return <div className="loading"><div className="spinner"/>データを読み込み中...</div>;
 
@@ -528,54 +560,141 @@ function ReportsView({members, projects, reports, onDelete, loading}) {
           {members.map(m=><option key={m.id} value={m.id}>{m.name}</option>)}
         </select>
       </div>
-      <div className="card">
-        <div className="tbl-wrap">
-          <table>
-            <thead><tr><th></th><th>日付</th><th>名前</th><th>案件</th><th>リスト数</th><th>架電</th><th>アポ</th><th>アポ率</th><th>通電率</th><th>所感</th><th></th></tr></thead>
-            <tbody>
-              {filtered.length===0&&<tr><td colSpan={11} className="empty">報告がありません</td></tr>}
-              {filtered.map(r=>{
-                const s=calcStats([r]);
-                const isExp=expandedId===r.id;
-                return(
-                  <React.Fragment key={r.id}>
-                    <tr>
-                      <td><button className="expand-btn" onClick={()=>setExpandedId(isExp?null:r.id)}>{isExp?"▲":"▼"}</button></td>
-                      <td>{r.date?String(r.date).slice(0,10):""}</td>
-                      <td style={{fontWeight:700}}>{getM(r.memberId)}</td>
-                      <td><span className="badge badge-blue">{getP(r.projectId)}</span></td>
-                      <td><span className="badge badge-cyan">{(r.entries||[]).length}リスト</span></td>
-                      <td>{s.calls}</td>
-                      <td style={{color:"var(--accent)",fontWeight:700}}>{s.appo}</td>
-                      <td>{s.appoRate}%</td><td>{s.connectRate}%</td>
-                      <td style={{color:"var(--accent2)",fontWeight:600}}>{s.selfConnectRate}%</td>
-                      <td style={{color:"var(--green)",fontWeight:700}}>{s.listCaRate}%</td>
-                      <td style={{maxWidth:180,overflow:"hidden",textOverflow:"ellipsis",color:"var(--muted)",fontSize:12,whiteSpace:"nowrap"}}
-                        title={r.impression||""}>{r.impression&&r.impression.trim()&&r.impression!=="0.0%"?r.impression:"-"}</td>
-                      <td><button className="btn btn-danger" onClick={()=>onDelete(r.id)}>削除</button></td>
-                    </tr>
-                    {isExp&&(r.entries||[]).map((e,i)=>{
-                      const es=calcStats([{entries:[e]}]);
-                      return(
-                        <tr key={i} style={{background:"#f8faff"}}>
-                          <td/><td/><td/>
-                          <td style={{color:"var(--accent2)",fontSize:12,fontWeight:600}}>└ {e.listName}</td>
-                          <td/>
-                          <td style={{fontSize:12}}>{Number(e.calls)||0}</td>
-                          <td style={{color:"var(--accent)",fontSize:12,fontWeight:700}}>{Number(e.appo)||0}</td>
-                          <td style={{fontSize:12}}>{es.appoRate}%</td>
-                          <td style={{fontSize:12}}>{es.connectRate}%</td>
-                          <td/>
-                        </tr>
-                      );
-                    })}
-                  </React.Fragment>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
+
+      {filtered.length===0&&<div className="card"><div className="empty">報告がありません</div></div>}
+
+      {filtered.map(r=>{
+        const s=calcStats([r]);
+        const isExp=expandedId===r.id;
+        const isEditing=editingId===r.id;
+        const displayDate=r.date?String(r.date).slice(0,10):"";
+
+        return(
+          <div key={r.id} className="card" style={{marginBottom:10}}>
+            {/* ヘッダー行 */}
+            <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
+              <button className="expand-btn" onClick={()=>setExpandedId(isExp?null:r.id)}>{isExp?"▲":"▼"}</button>
+              <span style={{fontWeight:700,fontSize:14}}>{displayDate}</span>
+              <span style={{fontWeight:700}}>{getM(r.memberId)}</span>
+              <span className="badge badge-blue">{getP(r.projectId)}</span>
+              <span className="badge badge-cyan">{(r.entries||[]).length}リスト</span>
+              <div style={{marginLeft:"auto",display:"flex",gap:6,flexWrap:"wrap",alignItems:"center"}}>
+                <span style={{fontSize:12,color:"var(--muted)"}}>架電:{s.calls} アポ:{s.appo} アポ率:{s.appoRate}%</span>
+                {!isEditing&&<button className="btn btn-sm" onClick={()=>startEdit(r)}>✏️ 修正</button>}
+                {!isEditing&&<button className="btn btn-danger" onClick={()=>onDelete(r.id)}>削除</button>}
+              </div>
+            </div>
+
+            {/* 展開内容 */}
+            {isExp&&!isEditing&&(
+              <div style={{marginTop:14}}>
+                {(r.entries||[]).map((e,i)=>(
+                  <div key={i} style={{background:"var(--surface2)",border:"1px solid var(--border)",borderRadius:8,padding:12,marginBottom:8}}>
+                    <div style={{fontWeight:700,color:"var(--accent2)",marginBottom:8,fontSize:13}}>📁 {e.listName}</div>
+                    <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8}}>
+                      {[
+                        {label:"架電数",key:"calls",color:"var(--text)"},
+                        {label:"アポ数",key:"appo",color:"var(--accent)"},
+                        {label:"本人資料請求",key:"materialSelf",color:"var(--accent2)"},
+                        {label:"不通",key:"noAnswer",color:"var(--muted)"},
+                        {label:"本人不在",key:"absent",color:"var(--muted)"},
+                        {label:"本人拒否",key:"rejectedSelf",color:"var(--red)"},
+                        {label:"受付拒否",key:"rejectedReception",color:"var(--red)"},
+                        {label:"受付資料請求",key:"materialReception",color:"var(--yellow)"},
+                        {label:"稼働時間",key:"workHours",color:"var(--text)"},
+                      ].map(f=>(
+                        <div key={f.key} style={{background:"#fff",border:"1px solid var(--border)",borderRadius:6,padding:"8px 10px"}}>
+                          <div style={{fontSize:10,color:"var(--muted)",fontWeight:700,marginBottom:3}}>{f.label}</div>
+                          <div style={{fontFamily:"'Space Mono',monospace",fontSize:18,fontWeight:700,color:f.color!=="var(--text)"&&f.color!=="var(--muted)"?f.color:"var(--text)"}}>
+                            {Number(e[f.key])||0}{f.key==="workHours"?"h":""}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+                {r.impression&&r.impression.trim()&&(
+                  <div style={{marginTop:8,background:"#fffbeb",border:"1px solid #fde68a",borderRadius:8,padding:12,fontSize:13,color:"var(--text)"}}>
+                    <span style={{fontWeight:700,color:"var(--yellow)"}}>📝 所感：</span>{r.impression}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 編集モード */}
+            {isEditing&&editData&&(
+              <div style={{marginTop:14}}>
+                <div style={{marginBottom:12,display:"flex",gap:10,flexWrap:"wrap"}}>
+                  <div>
+                    <label className="form-label">日付</label>
+                    <input className="form-input" type="date" style={{width:160}}
+                      value={String(editData.date||"").slice(0,10)}
+                      onChange={e=>setEditData(d=>({...d,date:e.target.value}))}/>
+                  </div>
+                  <div>
+                    <label className="form-label">名前</label>
+                    <select className="form-select" style={{width:140}} value={editData.memberId}
+                      onChange={e=>setEditData(d=>({...d,memberId:e.target.value}))}>
+                      {members.map(m=><option key={m.id} value={m.id}>{m.name}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="form-label">案件</label>
+                    <select className="form-select" style={{width:160}} value={editData.projectId}
+                      onChange={e=>setEditData(d=>({...d,projectId:e.target.value}))}>
+                      {projects.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}
+                    </select>
+                  </div>
+                </div>
+
+                {(editData.entries||[]).map((e,i)=>(
+                  <div key={i} style={{background:"var(--surface2)",border:"1.5px solid var(--border)",borderRadius:10,padding:14,marginBottom:10}}>
+                    <div style={{marginBottom:10}}>
+                      <label className="form-label">リスト名</label>
+                      <input className="form-input" value={e.listName||""}
+                        onChange={ev=>setEntryField(i,"listName",ev.target.value)}/>
+                    </div>
+                    <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:8}}>
+                      {[
+                        {label:"架電数",key:"calls"},
+                        {label:"アポ数",key:"appo"},
+                        {label:"本人資料請求",key:"materialSelf"},
+                        {label:"不通",key:"noAnswer"},
+                        {label:"本人不在",key:"absent"},
+                        {label:"本人拒否",key:"rejectedSelf"},
+                        {label:"受付拒否",key:"rejectedReception"},
+                        {label:"受付資料請求",key:"materialReception"},
+                        {label:"稼働時間",key:"workHours"},
+                      ].map(f=>(
+                        <div key={f.key} style={{display:"flex",alignItems:"center",gap:8}}>
+                          <label style={{fontSize:12,color:"var(--muted)",fontWeight:600,minWidth:100}}>{f.label}</label>
+                          <input className="form-input" type="number" min="0" style={{width:80}}
+                            value={e[f.key]||""}
+                            onChange={ev=>setEntryField(i,f.key,ev.target.value)}/>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+
+                <div style={{marginBottom:10}}>
+                  <label className="form-label">所感</label>
+                  <textarea className="form-input" style={{minHeight:70,resize:"vertical"}}
+                    value={editData.impression||""}
+                    onChange={e=>setEditData(d=>({...d,impression:e.target.value}))}/>
+                </div>
+
+                <div style={{display:"flex",gap:8,justifyContent:"flex-end"}}>
+                  <button className="btn btn-ghost" onClick={cancelEdit}>キャンセル</button>
+                  <button className="btn btn-green" onClick={saveEdit} disabled={saving}>
+                    {saving?"保存中...":"💾 保存する"}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -854,6 +973,11 @@ function App() {
     await apiPost({action:"deleteReport",id});
   },[]);
 
+  const updateReport=useCallback(async updated=>{
+    setReports(rs=>rs.map(r=>r.id===updated.id?updated:r));
+    await apiPost({action:"updateReport",data:updated});
+  },[]);
+
   const memberTabs=[{key:"report",label:"📋 日次報告"}];
   const adminTabs=[
     {key:"report",    label:"📋 日次報告"},
@@ -889,7 +1013,7 @@ function App() {
         {initError&&<div className="error-msg" style={{marginBottom:16}}>⚠️ {initError}</div>}
         {tab==="dashboard"&&isAdmin&&<DashboardView members={members} projects={projects} reports={reports} loading={loading}/>}
         {tab==="report"   &&<ReportFormView members={members} projects={projects} onSubmit={addReport} loading={loading}/>}
-        {tab==="reports"  &&isAdmin&&<ReportsView    members={members} projects={projects} reports={reports} onDelete={deleteReport} loading={loading}/>}
+        {tab==="reports"  &&isAdmin&&<ReportsView    members={members} projects={projects} reports={reports} onDelete={deleteReport} onUpdate={updateReport} loading={loading}/>}
         {tab==="admin"    &&isAdmin&&<AdminView       members={members} projects={projects} onSaveMembers={saveMembers} onSaveProjects={saveProjects} loading={loading}/>}
       </main>
     </div>
