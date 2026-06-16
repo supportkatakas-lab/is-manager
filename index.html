@@ -91,7 +91,7 @@ const {useState, useEffect, useCallback, useRef} = React;
 
 // ===== GAS API URL =====
 const GAS_URL = "https://script.google.com/macros/s/AKfycbxIlzttIprsOsUfNAzR3hdlzps0KHtpztzEuAbQ2xqCqhTAmvjrjARS2SukhvI-wPV7/exec";
-const ADMIN_PASSWORD = "admin"; // ★ 任意のパスワードに変更してください
+const ADMIN_PASSWORD = "is2024admin"; // ★ 任意のパスワードに変更してください
 
 // ===== API HELPERS =====
 async function apiGet() {
@@ -164,16 +164,30 @@ function calcStats(reports) {
 function exportToCSV(reports, members, projects) {
   const getM = id => members.find(m=>m.id===id)?.name||id;
   const getP = id => projects.find(p=>p.id===id)?.name||id;
-  const rows = [["日付","名前","案件名","リスト名","架電数","アポ数","本人資料請求","不通","本人不在","本人拒否","受付拒否","受付資料請求","アポ率(%)","通電率(%)","CA率(%)"]];
-  reports.sort((a,b)=>a.date?.localeCompare(b.date)).forEach(r => {
+  const rows = [["日付","名前","案件名","リスト名","稼働時間","架電数","アポ数","本人資料請求","不通","本人不在","本人拒否","受付拒否","受付資料請求","アポ率(%)","通電率(%)","CA率(%)","所感"]];
+  reports.sort((a,b)=>String(a.date||"").localeCompare(String(b.date||""))).forEach(r => {
     const entries = Array.isArray(r.entries) ? r.entries : [];
-    entries.forEach(e => {
+    entries.forEach((e,i) => {
       const s = calcStats([{entries:[e]}]);
-      rows.push([r.date,getM(r.memberId),getP(r.projectId),e.listName,
-        Number(e.calls)||0,Number(e.appo)||0,Number(e.materialSelf)||0,
-        Number(e.noAnswer)||0,Number(e.absent)||0,Number(e.rejectedSelf)||0,
-        Number(e.rejectedReception)||0,Number(e.materialReception)||0,
-        s.appoRate,s.connectRate,s.caRate]);
+      rows.push([
+        String(r.date||"").slice(0,10),
+        getM(r.memberId),
+        getP(r.projectId),
+        e.listName||"",
+        Number(e.workHours)||0,
+        Number(e.calls)||0,
+        Number(e.appo)||0,
+        Number(e.materialSelf)||0,
+        Number(e.noAnswer)||0,
+        Number(e.absent)||0,
+        Number(e.rejectedSelf)||0,
+        Number(e.rejectedReception)||0,
+        Number(e.materialReception)||0,
+        s.appoRate,
+        s.connectRate,
+        s.caRate,
+        i===0 ? (r.impression||"") : "", // 所感は最初のリスト行のみ
+      ]);
     });
   });
   const bom = "\uFEFF";
@@ -480,7 +494,7 @@ function ReportFormView({members, projects, onSubmit, loading}) {
         <label className="form-label" style={{marginBottom:8}}>📝 所感・メモ（任意）</label>
         <textarea
           className="form-input"
-          placeholder="今まで通り、各案件のテンプレートに沿って入力ください"
+          placeholder="今日のコールで気づいたこと、トークのポイント、リストの質感など自由に記入してください"
           value={impression}
           onChange={e=>setImpression(e.target.value)}
           style={{minHeight:100,resize:"vertical",lineHeight:1.6}}
