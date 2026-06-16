@@ -472,7 +472,7 @@ function ReportFormView({members, projects, onSubmit, loading}) {
             }
           </div>
           <div style={{marginBottom:12}}>
-            <label className="form-label">稼働時間（例：3.5）</label>
+            <label className="form-label">稼働時間（例：3.5）※本日の合計稼働時間を1回のみ入力</label>
             <input className="form-input" type="number" min="0" step="0.5" placeholder="例：3.5"
               value={entry.workHours} onChange={e=>setEntry(i,"workHours",e.target.value)}
               style={{maxWidth:160}}/>
